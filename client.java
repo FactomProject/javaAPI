@@ -35,6 +35,12 @@ public class client {
 			else if (args[0].equals("addecoutput")) {
 				test=apiCalls.AddECOutput(args[1],args[2],Integer.parseInt(args[3]));
 			}
+			else if (args[0].equals("balance")) {
+				test=apiCalls.GetAddresses();
+			}
+			else if (args[0].equals("balances")) {
+				test=apiCalls.GetAddresses();
+			}
 			else if (args[0].equals("buyentrycredits")) {
 				test=apiCalls.BuyEntryCreditsFullTransaction(args[1],args[2],Float.parseFloat(args[3]));
 			}
@@ -96,7 +102,20 @@ public class client {
 				test=apiCalls.GetExchangeRate();
 			}
 			else if (args[0].equals("getfee")) {
-				test=apiCalls.GetFee(args[1]);
+				if (args.length == 1) {
+					test=apiCalls.GetFee("");
+				} else {
+				test=apiCalls.GetFee(args[1]);					
+				}
+
+			}
+			else if (args[0].equals("list")) {
+				try {
+				test=apiCalls.GetProcessedTransactions(args[1],"");					
+				} catch (Exception e){
+					man("list");
+				}
+
 			}
 			else if (args[0].equals("mkchain")) {
 			    Scanner stdin = new Scanner(System.in);
@@ -245,6 +264,13 @@ if (cmd.equals("ALL") || cmd.equals("deletetransaction")) {
 System.out.println("deletetransaction key\tDelete the specified transaction in flight.");			
 System.out.println(" ");	
 }
+if (cmd.equals("ALL") || cmd.equals("balance")) {
+	System.out.println("balance key|address\tIf this is an ec balance, returns the number of.");			
+	System.out.println("\t \tentry credits.");			
+	System.out.println("\t \tIf this is a Factoid balance, returns the");			
+	System.out.println("\t \tfactoids at that address.");			
+System.out.println(" ");	
+}
 if (cmd.equals("ALL") || cmd.equals("getfee")) {
 System.out.println("getfee key \tGet the current fee required for this");			
 System.out.println("\t \ttransaction.  If a transaction is specified,");			
@@ -286,6 +312,16 @@ if (cmd.equals("ALL") || cmd.equals("submittransaction")) {
 System.out.println("submit\tkey\tSign the transaction specified by the key.");			
 System.out.println(" ");
 }
+if (cmd.equals("ALL") || cmd.equals("balances") || cmd.equals("getaddresses")) {
+	System.out.println("balances or");			
+	System.out.println("getaddresses\tReturns the list of addresses known to the");			
+	System.out.println("\t \twallet.  Returns the name that can be used");			
+	System.out.println("\t \ttied to each address, as well as the base 58");			
+	System.out.println("\t \taddress (which is the actual address).  This");			
+	System.out.println("\t \tcommand also returns the balances at each");			
+	System.out.println("\t \taddress.");			
+System.out.println(" ");
+}
 if (cmd.equals("ALL") || cmd.equals("sendfactoids")) {
 System.out.println("sendfactoid\t \tsingle call to send factoid.");			
 System.out.println(" \tfrom to amount\tfrom - address sending factoid.");			
@@ -300,6 +336,17 @@ System.out.println(" \t \tto - ec address receiving factoid.");
 System.out.println(" \t \tamount - in factoids");			
 System.out.println(" ");
 }
+if (cmd.equals("ALL") || cmd.equals("list")) {
+System.out.println("list\t \tList confirmed transactions' details.");			
+System.out.println(" \t[transaction id]\tList the confirmed transactions that use the");			
+System.out.println(" \t\ttransaction id.");			
+System.out.println(" \t[address]\tDumps all factoid transactions that use the");			
+System.out.println(" \t\tgiven address as an input or output.");			
+System.out.println(" \tall\tDumps all Factoid transactions to date (this wallet).");			
+		
+System.out.println(" ");
+}
+
 
 return " "; // this is just managing the test println in main.
 }  //man

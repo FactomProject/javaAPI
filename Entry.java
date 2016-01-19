@@ -79,13 +79,15 @@ public  class Entry {
 			resp=utils.appendByteToArray(resp, (byte)0);						//version
 			resp=utils.appendByteArrays(resp, ChainID);						//ChainID
 			
-			if (ExtIDs == null) {
+			if (ExtIDs == null) {  							
 				resp=utils.appendByteToArray(resp, (byte)0); // no external ID
 			} else {
-				for (i=0;i<ExtIDs .length ;i++){  // get length of ext ids (=2 each for next sections individual extid length)
+				// get length of ext ids (=2 each for next sections individual extid length)
+				for (i=0;i<ExtIDs .length ;i++){  
 					extidlength=extidlength + ExtIDs[i].length + 2;
 				}
-				resp=utils.appendByteArrays(resp,  utils.IntToByteArray(extidlength ));	//extid size (2 bytes) length of all extid data + item counts
+				//extid size (2 bytes) length of all extid data + item counts
+				resp=utils.appendByteArrays(resp,  utils.IntToByteArray(extidlength ));	
 				for ( i=0;i< ExtIDs .length ;i++){  //add each ext id
 					resp=utils.appendByteArrays(resp, utils.IntToByteArray(ExtIDs[i].length ) );				//extid size (2 bytes)
 					resp=utils.appendByteArrays(resp, ExtIDs [i]);

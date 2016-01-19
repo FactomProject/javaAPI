@@ -213,7 +213,7 @@ public class apiCalls {
 		
 		try {
 			
-			resp=utils.executeGet(factomdURL + "/v1/factoid-get-addresses/");
+			resp=utils.executeGet(fctwalletURL + "/v1/factoid-get-addresses/");
 		} catch (Exception e) {
 			// this is only going to return an error on connectivity or some other communication error
 			e.printStackTrace();
@@ -368,17 +368,18 @@ public class apiCalls {
 	
 	
 
-	
+
 	//Get Transaction  - 
 	// Retuens information about the current pending transactions
 	//  These are transactions being constructed, not ones that have been
 	//  signed and submitted
-	public static String getTransactions(String TransactionName) {
-		String resp="";
-	
-		try {
 
-			resp=utils.executeGet(fctwalletURL + "/v1/factoid-get-transactions/" );
+	public static String GetTransactions(String TransactionName) {
+		String resp="";
+		String postData="";
+
+		try {
+			resp=utils.executePost(fctwalletURL + "/v1/factoid-get-transactions/",postData );
 		} catch (Exception e) {
 			// this is only going to return an error on connectivity or some other communication error
 			e.printStackTrace();
@@ -386,9 +387,40 @@ public class apiCalls {
 		}
 		return resp;
 	}	
-	//Delete Transaction  - 
+	
+
+	//Get Transaction  - 
+	// Retuens information about the current pending transactions
+	//  These are transactions being constructed, not ones that have been
+	//  signed and submitted
+	// if format="JSON, return format as JSON
+	public static String GetProcessedTransactions(String TransactionName,String format) {
+		String resp="";
+		String postData="";
+		
+		if (TransactionName.equals("") || TransactionName.toUpperCase().equals("ALL")){
+			postData="cmd=all";
+		} else	{
+			postData="address=" + TransactionName;
+		}
+		
+		try {
+			if (!format.equals("JSON")) {
+			resp=utils.executePost(fctwalletURL + "/v1/factoid-get-processed-transactions/?" + postData,"" );		
+			}
+		} catch (Exception e) {
+			// this is only going to return an error on connectivity or some other communication error
+			e.printStackTrace();
+			resp="Error";
+		}
+		return resp;
+	}	
+	
+	
+	
+	//new Transaction  - 
 	// takes transaction name
-	// this deletes a transaction that has been created but not submitted.
+	// this creates a new temporary transaction for while it is being built.
 	public static String NewTransaction(String AddressName) {
 		String resp="";
 		
