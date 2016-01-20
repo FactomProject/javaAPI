@@ -329,7 +329,42 @@ public class apiCalls {
 		return resp;
 	} // end of GetEntry
 	
+	
 
+	//GetEntryCreditBalance 
+	// get ebhead by chainid
+	public static String GetEntryCreditBalance(String Account) {
+		String resp="";
+		
+		try {
+			
+			resp=utils.executeGet(fctwalletURL + "/v1/entry-credit-balance/" + Account);
+		} catch (Exception e) {
+			// this is only going to return an error on connectivity or some other communication error
+			e.printStackTrace();
+			resp="Error";
+		}
+		return resp;
+	} // end of GetChainHead
+	
+
+
+	//GetFactoidBalances 
+	// get ebhead by chainid
+	public static String GetFactoidBalance(String Account) {
+		String resp="";
+		
+		try {
+			
+			resp=utils.executeGet(fctwalletURL + "/v1/factoid-balance/" + Account);
+		} catch (Exception e) {
+			// this is only going to return an error on connectivity or some other communication error
+			e.printStackTrace();
+			resp="Error";
+		}
+		return resp;
+	} // end of GetChainHead
+	
 	
 		
 	//GetFee  - 
@@ -496,7 +531,7 @@ public class apiCalls {
 			resp=NewTransaction(transactionName);
 			resp=AddInput(transactionName,FromAddress,factoshi);
 			resp=AddECOutput(transactionName,ToAddress,factoshi);
-			resp=GetFee(transactionName);
+			resp=GetFee(transactionName); //getfee without a transactionname gives entry credit exchange rate.  just a warning.
 			resp=AddFee(transactionName,FromAddress);
 			resp=SignTransaction(transactionName);
 			resp=SubmitTransaction(transactionName);
@@ -546,7 +581,7 @@ public class apiCalls {
 			//System.out.println(resp);	
 			resp=AddOutput(transactionName,ToAddress,factoshi);
 			//System.out.println(resp);	
-			resp=GetFee(transactionName);
+			resp=GetFee(transactionName); //getfee without a transactionname gives entry credit exchange rate.  just a warning.
 			//System.out.println(resp);	
 			resp=AddFee(transactionName,FromAddress);
 			//System.out.println(resp);	

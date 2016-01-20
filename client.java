@@ -57,7 +57,14 @@ public class client {
 			}
 			else if (args[0].equals("balance")) {
 				try {
-					test=apiCalls.GetAddresses();
+					if (args[1].equals("fct")){
+						test=apiCalls.GetFactoidBalance(args[2]);					
+					} else if (args[1].equals("ec")) {
+						test=apiCalls.GetEntryCreditBalance(args[2]);							
+					} else {
+						test=man(args[0]);					
+					}
+
 				} catch (Exception e) {
 					test=man(args[0]);
 				}					
@@ -173,7 +180,7 @@ public class client {
 
 				try {
 					if (args.length == 1) {
-						test="getfee with no transaction id returns the Entry Credit exchange rate.  Please use getexchangerate or add transaction id.";
+						test=apiCalls.GetFee(" ");		
 					} else {
 						test=apiCalls.GetFee(args[1]);					
 					}
