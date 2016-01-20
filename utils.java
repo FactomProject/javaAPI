@@ -16,7 +16,6 @@ public class utils {
 	// EXECUTE POST
 		public static String executePost(String targetURL, String urlParameters) {
 			  HttpURLConnection connection = null;  
-			  System.out.println("POST:  " + targetURL);
 			  try {
 			    //Create connection
 			    URL url = new URL(targetURL);
@@ -48,7 +47,7 @@ public class utils {
 			    }
 			    rd.close();
 			   
-			    System.out.println("response=" + response.toString());
+	
 			    if (response.length() == 0 ){
 			    	// if nothing is coming back, at least send the response code.
 			    	// a correct commit only returns 200-ok
@@ -67,7 +66,6 @@ public class utils {
 		// EXECUTE POST
 		public static String executePostBytes(String targetURL, byte[] urlParameters) {
 			  HttpURLConnection connection = null;  
-			  System.out.println("POST:  " + targetURL);
 			  try {
 			    //Create connection
 			    URL url = new URL(targetURL);
@@ -110,8 +108,7 @@ public class utils {
 			} // execute post
 		
 	// EXECUTE GET
-	public static String executeGet(String targetURL) {
-		  System.out.println("GET:  " + targetURL);		
+	public static String executeGet(String targetURL) {	
 		  HttpURLConnection connection = null;  
 		  try {
 		    //Create connection
@@ -124,11 +121,6 @@ public class utils {
 		    connection.setUseCaches(false);
 		    connection.setDoOutput(true);
 
-		    //Send request
-		    //DataOutputStream wr = new DataOutputStream (
-		    //    connection.getOutputStream());
-		    //wr.writeBytes(urlParameters);
-		    //wr.close();
 
 		    //Get Response  
 		    InputStream is = connection.getInputStream();
@@ -142,8 +134,7 @@ public class utils {
 		    rd.close();
 		    return response.toString();
 		  } catch (Exception e) {
-		    e.printStackTrace();
-		    return null;
+		    return e.getMessage();
 		  } finally {
 		    if(connection != null) {
 		      connection.disconnect(); 
@@ -159,7 +150,7 @@ public class utils {
 		buffer.putLong(ml);
 		holder= buffer.array();				
 	
-		System.out.println("millibytes: " + holder.length );
+
 		//This gives you 8 bytes.  we want 6
 		byte[] resp=new byte[6];
 		resp[0]=holder[2];

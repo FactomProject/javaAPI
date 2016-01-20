@@ -137,7 +137,7 @@ public class apiCalls {
 		
 		try {
 			
-			resp=utils.executeGet(fctwalletURL + "/v1/factoid-generate-fct-address/" + AddressName);
+			resp=utils.executeGet(fctwalletURL + "/v1/factoid-generate-address/" + AddressName);
 		} catch (Exception e) {
 			// this is only going to return an error on connectivity or some other communication error
 			e.printStackTrace();
@@ -285,7 +285,7 @@ public class apiCalls {
 		
 		try {
 			
-			resp=utils.executeGet(factomdURL + "/v1/directory-block-head/");
+			resp=utils.executeGet(factomdURL + "/v1/directory-block-height/");
 		} catch (Exception e) {
 			// this is only going to return an error on connectivity or some other communication error
 			e.printStackTrace();
@@ -539,26 +539,26 @@ public class apiCalls {
 		
 		try {
 			resp=DeleteTransaction(transactionName);
-			System.out.println(resp);	
+			//System.out.println(resp);	
 			resp=NewTransaction(transactionName);
-			System.out.println(resp);	
+			//System.out.println(resp);	
 			resp=AddInput(transactionName,FromAddress,factoshi);
-			System.out.println(resp);	
+			//System.out.println(resp);	
 			resp=AddOutput(transactionName,ToAddress,factoshi);
-			System.out.println(resp);	
+			//System.out.println(resp);	
 			resp=GetFee(transactionName);
-			System.out.println(resp);	
+			//System.out.println(resp);	
 			resp=AddFee(transactionName,FromAddress);
-			System.out.println(resp);	
+			//System.out.println(resp);	
 			resp=SignTransaction(transactionName);
-			System.out.println(resp);	
+			//System.out.println(resp);	
 			resp=SubmitTransaction(transactionName);
-			System.out.println(resp);	
+			//System.out.println(resp);	
 			} catch (Exception e) {
 			// this is only going to return an error on connectivity or some other communication error
 			e.printStackTrace();
 		
-			System.out.println(resp);
+			//System.out.println(resp);
 			
 		}
 		return resp;
@@ -717,5 +717,7 @@ public class apiCalls {
 ////////////////////////////////////////////////////////////////////////////////////////////////
 	//UTILITIES
 ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 }
