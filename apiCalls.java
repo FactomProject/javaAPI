@@ -641,6 +641,8 @@ public class apiCalls {
 	// extids external ids as array of strings
 	//  data - data to be to blockchain entry
 	
+	// THIS IS CURRENTLY HAVING ISSUES.  RESPONDS CORRECTLY BUY CHAIN IS NOT PRESENT.  Update coming soon
+	
 	public static String ComposeChainCommit(String name, String[] extids,String data) {
 		String resp="";		
 		Chain c=new Chain();	

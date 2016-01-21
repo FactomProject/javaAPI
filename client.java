@@ -387,10 +387,11 @@ System.out.println("  deletetransaction key  Delete the specified transaction in
 System.out.println(" ");	
 }
 if (cmd.equals("ALL") || cmd.equals("balance")) {
-System.out.println("  balance key|address    If this is an ec balance, returns the number of.");			
+System.out.println("  balance type address    If this is an ec balance, returns the number of.");			
 System.out.println("                         entry credits.");			
 System.out.println("                         If this is a Factoid balance, returns the");			
 System.out.println("                         factoids at that address.");			
+System.out.println("                         type should be fct or ec");			
 System.out.println(" ");	
 }
 if (cmd.equals("ALL") || cmd.equals("getfee")) {
