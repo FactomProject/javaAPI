@@ -20,7 +20,7 @@ public class apiCalls {
 
 	
 	//AddFee  - 
-	// takes transaction name
+	// takes transaction name 
 	// Address and or address to take the fees from
 	// returns amount (factoshi) that will be used in addfee.  so you know
 	public static String AddFee(String TransactionName,String AddressName) {
@@ -47,7 +47,12 @@ public class apiCalls {
 	// this deletes a transaction that has been created but not submitted.
 	public static String AddInput(String TransactionName,String AddressName,long FactoshiAmount) {
 		String resp="";
-		
+		if (FactoshiAmount < 0) {
+			return "{\"Response\":\"Negative Values Not Allowed.\",\"Success\":false}";
+		}
+		if (AddressName.length() > 32) {
+			return "{\"Response\":\"Addresses cannot be over 32 bytes\",\"Success\":false}";			
+		}
 		try {
 			System.out.println(fctwalletURL + "/v1/factoid-add-input/?key=" + TransactionName + "&name=" + AddressName + "&amount=" + FactoshiAmount);
 			resp=utils.executePost(fctwalletURL + "/v1/factoid-add-input/?key=" + TransactionName + "&name=" + AddressName + "&amount=" + FactoshiAmount,"");
@@ -70,6 +75,12 @@ public class apiCalls {
 	// this deletes a transaction that has been created but not submitted.
 	public static String AddOutput(String TransactionName,String AddressName,long FactoshiAmount) {
 		String resp="";
+		if (FactoshiAmount < 0) {
+			return "{\"Response\":\"Negative Values Not Allowed.\",\"Success\":false}";
+		}
+		if (AddressName.length() > 32) {
+			return "{\"Response\":\"Addresses cannot be over 32 bytes\",\"Success\":false}";			
+		}
 		
 		try {
 			
@@ -93,8 +104,14 @@ public class apiCalls {
 	// this will create entry credits at the current exchange rate.
 	// if you need to create a specific number of entry credits, work out the number of factoids to use in advance
 	// this deletes a transaction that has been created but not submitted.
-	public static String AddECOutput(String TransactionName,String AddressName,Integer Amount) {
+	public static String AddECOutput(String TransactionName,String AddressName,long Amount) {
 		String resp="";
+		if (Amount < 0) {
+			return "{\"Response\":\"Negative Values Not Allowed.\",\"Success\":false}";
+		}
+		if (AddressName.length() > 32) {
+			return "{\"Response\":\"Addresses cannot be over 32 bytes\",\"Success\":false}";			
+		}
 		
 		try {
 			
@@ -134,7 +151,9 @@ public class apiCalls {
 	// takes address name
 	public static String GenerateFactoidAddress(String AddressName) {
 		String resp="";
-		
+		if (AddressName.length() > 32) {
+			return "{\"Response\":\"Addresses cannot be over 32 bytes\",\"Success\":false}";			
+		}
 		try {
 			
 			resp=utils.executeGet(fctwalletURL + "/v1/factoid-generate-address/" + AddressName);
@@ -152,6 +171,9 @@ public class apiCalls {
 	//GENERATE NEW ENTRY CREDIT ADDRESS  - 
 	// takes address name
 	public static String GenerateEntryCreditAddress(String AddressName) {
+		if (AddressName.length() > 32) {
+			return "{\"Response\":\"Addresses cannot be over 32 bytes\",\"Success\":false}";			
+		}
 		String resp="";
 		
 		try {
@@ -173,7 +195,9 @@ public class apiCalls {
 	//  it is Human Readable because it wants your hex string, not the byte array
 	public static String GenerateAddressFromHumanReadablePrivateKey(String AddressName, String PrivateKey) {
 		String resp="";
-
+		if (AddressName.length() > 32) {
+			return "{\"Response\":\"Addresses cannot be over 32 bytes\",\"Success\":false}";			
+		}
 		try {
 			
 			resp=utils.executeGet(fctwalletURL + "/v1/factoid-generate-address-from-human-readable-private-key/?name=" + AddressName + "&privateKey=" + PrivateKey);
@@ -191,7 +215,9 @@ public class apiCalls {
 	// takes address name
 	public static String GenerateEntryCreditAddressFromHumanReadablePrivateKey(String AddressName, String PrivateKey) {
 		String resp="";
-		
+		if (AddressName.length() > 32) {
+			return "{\"Response\":\"Addresses cannot be over 32 bytes\",\"Success\":false}";			
+		}
 		try {
 			
 			resp=utils.executeGet(fctwalletURL + "/v1/factoid-generate-ec-address-from-human-readable-private-key/?name=" + AddressName + "&privateKey=" + PrivateKey);
@@ -409,12 +435,11 @@ public class apiCalls {
 	//  These are transactions being constructed, not ones that have been
 	//  signed and submitted
 
-	public static String GetTransactions(String TransactionName) {
+	public static String GetTransactions() {
 		String resp="";
-		String postData="";
 
 		try {
-			resp=utils.executePost(fctwalletURL + "/v1/factoid-get-transactions/",postData );
+			resp=utils.executeGet(fctwalletURL + "/v1/factoid-get-transactions/");
 		} catch (Exception e) {
 			// this is only going to return an error on connectivity or some other communication error
 			e.printStackTrace();
@@ -519,9 +544,15 @@ public class apiCalls {
 	// This is not base functionality.  It is a composite call that combines the 7 calls required for 
 	//   sending factoid into one call for ease of use.  In that vein, this function handled the factoshi conversion
 	public static String BuyEntryCreditsFullTransaction(String FromAddress,String ToAddress,Float Amount) {
+		if (Amount < 0) {
+			return "{\"Response\":\"Negative Values Not Allowed.\",\"Success\":false}";
+		}
 		String resp="";
 		String transactionName="Tran001";
-		Integer factoshi=0;
+		long factoshi=0;
+		
+	    factoshi=Amount.intValue();
+		factoshi= factoshi * 100000000;  // convert to factoshi (1 factoshi=1/100000000 factoid)
 		
 	
 		factoshi=(int) (Amount * 100000000);  // convert to factoshi (1 factoshi=1/100000000 factoid)
@@ -565,6 +596,9 @@ public class apiCalls {
 	// This is not base functionality.  It is a composite call that combines the 7 calls required for 
 	//   sending factoid into one call for ease of use.  In that vein, this function handled the factoshi conversion
 	public static String SendFactoidsFullTransaction(String FromAddress,String ToAddress,Float Amount) {
+		if (Amount < 0) {
+			return "{\"Response\":\"Negative Values Not Allowed.\",\"Success\":false}";
+		}
 		String resp="";
 		String transactionName="Tran001";
 		long factoshi=0;

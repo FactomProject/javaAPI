@@ -19,8 +19,23 @@ public class client {
 	public static void main(String[] args) {
 
 		String test=""; 
+/*
+		byte[] TempArray=new byte[0];
+		byte[] bhello=utils.sha256String("HELLO");
+		byte[] bworld=utils.sha256String("WORLD");
+		byte[] b2016=utils.sha256String("FACTOM 2016!");		
+		String shello=utils.bytesToHex(bhello);
+		String sworld=utils.bytesToHex(bworld);
+		String s2016=utils.bytesToHex(b2016);
 
-
+								
+		System.out.println(shello);
+		System.out.println(sworld);
+		System.out.println(s2016);
+		
+		TempArray=utils.
+		String appendstrings =utils.hexToBytes(shello + sworld + s2016);
+System.exit(1);*/
 		if (args.length == 0) {
 			 test= man("ALL");			
 		} else {
@@ -33,7 +48,12 @@ public class client {
 			}
 			if (args[0].equals("addinput")) {
 				try {
-					test=apiCalls.AddInput(args[1],args[2],Integer.parseInt(args[3]));
+					long factoshi=0;
+					
+					//factoshi are whole numbers.
+				    factoshi=Long.parseLong(String.valueOf(Float.parseFloat(args[3]) * 100000000) );
+
+					test=apiCalls.AddInput(args[1],args[2],factoshi);
 				} catch (Exception e) {
 					test=man(args[0]);
 				}				
@@ -205,7 +225,7 @@ public class client {
 			    	String line = stdin.next();
 			        chainBody += " " + line;
 			    }
-			
+			System.out.println("out of stdin");
 				stdin.close();
 			    //args[1] is the payment address
 				// semantics, but chain body is really 'entry body'
@@ -278,7 +298,7 @@ public class client {
 			}
 			else if (args[0].equals("transactions")) {
 				try {
-					test=apiCalls.SendFactoidsFullTransaction(args[1],args[2],Float.parseFloat(args[3]));
+						test=apiCalls.GetTransactions();
 				} catch (Exception e){
 					man(args[0]);
 				}
@@ -304,8 +324,8 @@ public class client {
 // DIRECTIONS FOR USE
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 public static String man(String cmd) {
-System.out.println("factom-cli	[options]	[subcommand]");		
-if (cmd.equals("ALL") || cmd.equals("get")) {
+System.out.println("java -jar FactomAPI.jar	[options]	[subcommand]");		
+if (cmd.equals("ALL") || cmd.equals("get")) { 
 System.out.println("  get          ");			
 System.out.println("     head                Get the keymr of the last completed directory block");					
 System.out.println("     height              Get the currenct directory block height");					
@@ -340,7 +360,7 @@ System.out.println("     fct name            Generate a factoid address, tied to
 System.out.println("                         Names must be unique, or you will get a");
 System.out.println("                         Duplicate Name or Invalid Name Error.");
 System.out.println("     ec name Es...       Import a secret EC key to the wallet");
-System.out.println("     fct name Es...      Import a secret Factoid key to the wallet");
+System.out.println("     fct name Fs...      Import a secret Factoid key to the wallet");
 System.out.println(" ");
 }
 if (cmd.equals("ALL") || cmd.equals("addinput")) {
