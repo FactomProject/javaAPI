@@ -96,6 +96,12 @@ public class utils {
 			      response.append('\r');
 			    }
 			    rd.close();
+			    
+			    if (response.length() == 0 ){
+			    	// if nothing is coming back, at least send the response code.
+			    	// a correct commit only returns 200-ok
+			    	response.append(connection.getResponseCode());
+			    }
 			    return response.toString();
 			  } catch (Exception e) {
 			    e.printStackTrace();

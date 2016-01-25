@@ -4,6 +4,10 @@
 package Factom;
 import java.util.Scanner;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 /**
  * @author matt whittington
  * @version 0.1
@@ -19,6 +23,31 @@ public class client {
 	public static void main(String[] args) {
 
 		String test=""; 
+		
+	/*
+  Entry ec=new Entry();
+  String[] ext={"-e","foo","-e","bar"};
+  ec.setExtIDs(ext);
+  ec.createChainID();
+  ec.Content="Hello Factom!".getBytes();
+  ec.setEntryHash();
+  
+
+  
+  System.out.println("Chainid:" + utils.bytesToHex(ec.ChainID ));
+  System.out.println("entryhash:" + utils.bytesToHex(ec.entryHash ));
+  System.out.println("entrybytes:" + utils.bytesToHex(ec.toBytes() ));
+  
+  System.out.println("Chainid double sha256:" + utils.bytesToHex(utils.sha256Bytes(utils.sha256Bytes(ec.ChainID)) ));
+  
+  System.out.println("Commit weld:" + utils.bytesToHex(utils.sha256Bytes(utils.sha256Bytes(utils.appendByteArrays(ec.entryHash ,ec.ChainID))) ));
+  try {
+  System.out.println("content:" + new String(ec.Content , "UTF-8") );
+  } catch (Exception exc){
+	  
+  }
+System.exit(1);
+		
 /*
 		byte[] TempArray=new byte[0];
 		byte[] bhello=utils.sha256String("HELLO");
@@ -171,7 +200,42 @@ System.exit(1);*/
 						if (args[2].equals("chainid")){
 							System.out.println("Please enter a chain id, not 'chainid'");
 						} else {
-							test=apiCalls.GetFirstEntry(args[2]);						
+							test=apiCalls.GetFirstEntry(args[2]);	
+							
+							
+							
+							// parse the json response from getFirstEntry
+							// make it pretty for output
+							
+							JSONArray ExtIDs=new JSONArray();
+							JSONTokener jt=new JSONTokener(test);
+							JSONObject jo=new JSONObject();
+							try {							
+								 String prettyResponse="";
+								 String content="";
+	
+								 jo=(JSONObject) jt.nextValue();
+								 String chainID=jo.getString("ChainID");
+								 prettyResponse="ChainID:" + chainID;
+								 content= jo.getString("Content");
+	
+									 
+								 String thisExtID="";
+								 ExtIDs=jo.getJSONArray("ExtIDs");
+								 for (int i=0;i<ExtIDs.length();i++) {
+									 thisExtID=ExtIDs.get(i).toString();
+									
+									 prettyResponse += "\nExtID:" + new String (utils.hexToBytes(thisExtID),"UTF-8");
+								 }
+								 prettyResponse += "\nContent:" + new String (utils.hexToBytes(content),"UTF-8");
+								 test=prettyResponse;
+						
+							} catch (Exception e) {
+								e.printStackTrace();
+								test= "Entry Not Found";
+							}
+					
+							
 						}
 	
 					}
@@ -223,7 +287,12 @@ System.exit(1);*/
 			    System.out.println("Enter the content of your entry here.  \nEnter ctrl-Z on a blank line to end keyboard capture");
 			    while(stdin.hasNext()){
 			    	String line = stdin.next();
-			        chainBody += " " + line;
+			    	if (!chainBody.equals("")){
+			        chainBody += " " + line;			    		
+			    	} else {
+				        chainBody = line;		    		
+			    	}
+
 			    }
 			System.out.println("out of stdin");
 				stdin.close();
@@ -272,9 +341,13 @@ System.exit(1);*/
 				    System.out.println("Enter the content of your entry here.  \nEnter ctrl-Z on a blank line to end keyboard capture");
 				    while(stdin.hasNext()){
 				    	String line = stdin.next();
-				    	entryBody += " " + line;
+				    	if (!entryBody.equals("")){
+				    		entryBody += " " + line;			    		
+				    	} else {
+				    		entryBody = line;		    		
+				    	}
 				    }
-				
+				System.out.println("out of stdin");
 					stdin.close();
 				    //args[1] is the payment address
 					test=apiCalls.ComposeEntryCommit(args[1],args,entryBody);

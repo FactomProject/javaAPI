@@ -45,6 +45,7 @@ public  class Entry {
 				 item=utils.hexToBytes(args[i]);
 				 
 				 ChainID=item;
+				 System.out.println("Chain=" + utils.bytesToHex(ChainID));
 			 }
 			 if (args[i].equals("-c")) {
 				 flg=true;
@@ -111,6 +112,11 @@ public  class Entry {
 		
 		entryHash= resp;
 		
+		  try {
+			  System.out.println("content:" + new String(Content , "UTF-8") );
+			  } catch (Exception exc){
+				  
+			  }
 	}
 
 }
