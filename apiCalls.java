@@ -134,12 +134,12 @@ public class apiCalls {
 	//Delete Transaction  - 
 	// takes transaction name
 	// this deletes a transaction that has been created but not submitted.
-	public static String DeleteTransaction(String AddressName) {
+	public static String DeleteTransaction(String TransactionName) {
 		String resp="";
 		
 		try {
 			
-			resp=utils.executePost(fctwalletURL + "/v1/factoid-delete-transaction/" + AddressName,"");
+			resp=utils.executePost(fctwalletURL + "/v1/factoid-delete-transaction/" + TransactionName,"");
 		} catch (Exception e) {
 			// this is only going to return an error on connectivity or some other communication error
 			e.printStackTrace();
@@ -484,12 +484,12 @@ public class apiCalls {
 	//new Transaction  - 
 	// takes transaction name
 	// this creates a new temporary transaction for while it is being built.
-	public static String NewTransaction(String AddressName) {
+	public static String NewTransaction(String TransactionName) {
 		String resp="";
 		
 		try {
 			
-			resp=utils.executePost(fctwalletURL + "/v1/factoid-new-transaction/" + AddressName,"");
+			resp=utils.executePost(fctwalletURL + "/v1/factoid-new-transaction/" + TransactionName,"");
 		} catch (Exception e) {
 			// this is only going to return an error on connectivity or some other communication error
 			e.printStackTrace();
@@ -761,13 +761,15 @@ public class apiCalls {
 		}
 		postData=utils.appendByteArrays(postData, e.entryHash);	//hash of entry
 		postData=utils.appendByteToArray(postData, (byte)1);	//entry cost (entry content divided by 1k
-		
-
+		System.out.println(utils.bytesToHex(postData));
+	    
 		//rI could use a json marshal here, but I want the message format to be obvious.
 		postData=utils.appendByteArrays("{\"Message\":\"".getBytes(), postData);
 		postData=utils.appendByteArrays( postData,"\"}".getBytes());
+	
 		try{
-        System.out.println(new String(postData,"UTF-8"));			
+	        System.out.println(new String(postData,"UTF-8"));
+		
 		} catch (Exception dontcare){
 			
 		}

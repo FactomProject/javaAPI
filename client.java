@@ -2,6 +2,7 @@
  * 
  */
 package Factom;
+import java.text.DecimalFormat;
 import java.util.Scanner;
 
 import org.json.JSONArray;
@@ -23,48 +24,7 @@ public class client {
 	public static void main(String[] args) {
 
 		String test=""; 
-		
-	/*
-  Entry ec=new Entry();
-  String[] ext={"-e","foo","-e","bar"};
-  ec.setExtIDs(ext);
-  ec.createChainID();
-  ec.Content="Hello Factom!".getBytes();
-  ec.setEntryHash();
-  
-
-  
-  System.out.println("Chainid:" + utils.bytesToHex(ec.ChainID ));
-  System.out.println("entryhash:" + utils.bytesToHex(ec.entryHash ));
-  System.out.println("entrybytes:" + utils.bytesToHex(ec.toBytes() ));
-  
-  System.out.println("Chainid double sha256:" + utils.bytesToHex(utils.sha256Bytes(utils.sha256Bytes(ec.ChainID)) ));
-  
-  System.out.println("Commit weld:" + utils.bytesToHex(utils.sha256Bytes(utils.sha256Bytes(utils.appendByteArrays(ec.entryHash ,ec.ChainID))) ));
-  try {
-  System.out.println("content:" + new String(ec.Content , "UTF-8") );
-  } catch (Exception exc){
-	  
-  }
-System.exit(1);
-		
-/*
-		byte[] TempArray=new byte[0];
-		byte[] bhello=utils.sha256String("HELLO");
-		byte[] bworld=utils.sha256String("WORLD");
-		byte[] b2016=utils.sha256String("FACTOM 2016!");		
-		String shello=utils.bytesToHex(bhello);
-		String sworld=utils.bytesToHex(bworld);
-		String s2016=utils.bytesToHex(b2016);
-
-								
-		System.out.println(shello);
-		System.out.println(sworld);
-		System.out.println(s2016);
-		
-		TempArray=utils.
-		String appendstrings =utils.hexToBytes(shello + sworld + s2016);
-System.exit(1);*/
+	
 		if (args.length == 0) {
 			 test= man("ALL");			
 		} else {
@@ -75,22 +35,28 @@ System.exit(1);*/
 					test=man(args[0]);
 				}
 			}
-			if (args[0].equals("addinput")) {
+			else if (args[0].equals("addinput")) {
 				try {
 					long factoshi=0;
 					
 					//factoshi are whole numbers.
-				    factoshi=Long.parseLong(String.valueOf(Float.parseFloat(args[3]) * 100000000) );
-
+					float f=Float.parseFloat(args[3]);
+					factoshi=Math.round(f*100000000);
 					test=apiCalls.AddInput(args[1],args[2],factoshi);
 				} catch (Exception e) {
+					e.printStackTrace();
 					test=man(args[0]);
 				}				
 				
 			}
 			else if (args[0].equals("addoutput")) {
 				try {
-					test=apiCalls.AddOutput(args[1],args[2],Integer.parseInt(args[3]));
+					long factoshi=0;
+					
+					//factoshi are whole numbers.
+					float f=Float.parseFloat(args[3]);
+					factoshi=Math.round(f*100000000);
+					test=apiCalls.AddOutput(args[1],args[2],factoshi);
 				} catch (Exception e) {
 					test=man(args[0]);
 				}					
@@ -98,7 +64,12 @@ System.exit(1);*/
 			}
 			else if (args[0].equals("addecoutput")) {
 				try {
-					test=apiCalls.AddECOutput(args[1],args[2],Integer.parseInt(args[3]));
+					long factoshi=0;
+					
+					//factoshi are whole numbers.
+					float f=Float.parseFloat(args[3]);
+					factoshi=Math.round(f*100000000);
+					test=apiCalls.AddECOutput(args[1],args[2],factoshi);
 				} catch (Exception e) {
 					test=man(args[0]);
 				}					
@@ -138,6 +109,15 @@ System.exit(1);*/
 			else if (args[0].equals("deletetransaction")) {
 				try {
 					test=apiCalls.DeleteTransaction(args[1]);
+
+					JSONTokener jt=new JSONTokener(test);
+					JSONObject jo=new JSONObject();
+					try {						
+						 jo=(JSONObject) jt.nextValue();
+						 test=jo.getString("Response");
+					} catch (Exception e) {
+						test=man(args[0]);
+					}	
 				} catch (Exception e) {
 					test=man(args[0]);
 				}				
@@ -439,7 +419,8 @@ System.out.println(" ");
 if (cmd.equals("ALL") || cmd.equals("addinput")) {
 System.out.println("  addinput               Add an input to a transaction");			
 System.out.println("     key name amount     Use the name supplied in newaddress");			
-System.out.println("     key address amount  Use an address");			
+System.out.println("     key address amount  Use an address");
+System.out.println("                         Amounts are in Factoid");		
 System.out.println(" ");	
 }
 if (cmd.equals("ALL") || cmd.equals("addecoutput")) {
@@ -447,12 +428,14 @@ System.out.println("  addecoutput            Add an ecoutput (Purchase of entry 
 System.out.println("                         a transaction");			
 System.out.println("     key name amount     Use the name supplied in newaddress");			
 System.out.println("     key address amount  Use an address");			
+System.out.println("                         Amounts are in Factoid");		
 System.out.println(" ");	
 }
 if (cmd.equals("ALL") || cmd.equals("outinput")) {
 System.out.println("  addoutput              Add an output to a transaction");			
 System.out.println("     key name amount     Use the name supplied in newaddress");			
 System.out.println("     key address amount  Use an address");			
+System.out.println("                         Amounts are in Factoid");			
 System.out.println(" ");	
 }
 if (cmd.equals("ALL") || cmd.equals("deletetransaction")) {
