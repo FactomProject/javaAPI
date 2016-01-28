@@ -23,6 +23,7 @@ public class client {
 	 */
 	public static void main(String[] args) {
 		
+
 		String test=""; 
 	
 		if (args.length == 0) {
@@ -394,8 +395,24 @@ public class client {
 				} catch (Exception e){
 					man(args[0]);
 				}
-			} else {
-			 man("ALL");				
+			} else if (args[0].equals("verifyaddress")) {
+					try {
+						test=apiCalls.verifyAddress(args[1]);
+						JSONTokener jt=new JSONTokener(test);
+						JSONObject jo=new JSONObject();
+						try {							
+							 jo=(JSONObject) jt.nextValue();
+							 test=jo.getString("Response");
+
+						} catch (Exception e) {
+							e.printStackTrace();
+							test="Error or invalid address.";
+						}		
+					} catch (Exception e){
+						man(args[0]);
+					}
+				} else {
+				 man("ALL");				
 			}
 			
 		}
@@ -554,6 +571,11 @@ System.out.println("                         transaction id.");
 System.out.println("     [address]           Dumps all factoid transactions that use the");			
 System.out.println("                         given address as an input or output.");			
 System.out.println("     all                 Dumps all Factoid transactions to date (this wallet).");			
+		
+System.out.println(" ");
+}
+if (cmd.equals("ALL") || cmd.equals("verifyaddress")) {
+System.out.println("  verifyaddress address  Returns the address type for a valid address.");						
 		
 System.out.println(" ");
 }

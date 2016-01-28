@@ -1,5 +1,5 @@
 package Factom;
-import org.json.* ;
+
 
 
 
@@ -589,6 +589,21 @@ public class apiCalls {
 		}
 		return resp;
 	}
+	
+	public static String verifyAddress(String AddressName) {
+		String resp="";
+		
+		try {
+			
+			resp=utils.executeGet(fctwalletURL + "/v1/verify-address-type/?address=" + AddressName);
+		} catch (Exception e) {
+			// this is only going to return an error on connectivity or some other communication error
+			e.printStackTrace();
+			resp="Error";
+		}
+		return resp;
+	} // end of addOutput
+	
 		
 	
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
