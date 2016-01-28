@@ -2,7 +2,7 @@
  * 
  */
 package Factom;
-import java.text.DecimalFormat;
+
 import java.util.Scanner;
 
 import org.json.JSONArray;
@@ -22,7 +22,7 @@ public class client {
 	 *  for usage run man
 	 */
 	public static void main(String[] args) {
-
+		
 		String test=""; 
 	
 		if (args.length == 0) {
@@ -252,13 +252,45 @@ public class client {
 					man(args[0]);
 				}	
 			}
+			else if (args[0].equals("properties")) {
+
+				try {
+
+						test=apiCalls.GetProperties();			
+
+						// parse the json response
+						// make it pretty for output
+						
+						JSONTokener jt=new JSONTokener(test);
+						JSONObject jo=new JSONObject();
+						try {							
+							 jo=(JSONObject) jt.nextValue();
+							 if (jo.getBoolean("Success")) {
+							 String Response=jo.getString("Response");
+							// replace "\n newlines with system independent character
+							 	Response=Response.replaceAll("\n",System.getProperty("line.separator"));
+							 	test=Response;
+							 } else {
+								 test="Properties Not Available"; 
+							 }
+
+						} catch (Exception e) {
+							e.printStackTrace();
+							test="Properties Not Available";
+						}
+				
+						
+
+				} catch (Exception e) {
+					man(args[0]);
+				}	
+			}
 			else if (args[0].equals("list")) {
 				try {
 					test=apiCalls.GetProcessedTransactions(args[1],"");					
 				} catch (Exception e){
 					man(args[0]);
 				}
-
 			}
 			else if (args[0].equals("mkchain")) {
 				try {
@@ -431,7 +463,7 @@ System.out.println("     key address amount  Use an address");
 System.out.println("                         Amounts are in Factoid");		
 System.out.println(" ");	
 }
-if (cmd.equals("ALL") || cmd.equals("outinput")) {
+if (cmd.equals("ALL") || cmd.equals("addoutput")) {
 System.out.println("  addoutput              Add an output to a transaction");			
 System.out.println("     key name amount     Use the name supplied in newaddress");			
 System.out.println("     key address amount  Use an address");			
@@ -522,6 +554,12 @@ System.out.println("                         transaction id.");
 System.out.println("     [address]           Dumps all factoid transactions that use the");			
 System.out.println("                         given address as an input or output.");			
 System.out.println("     all                 Dumps all Factoid transactions to date (this wallet).");			
+		
+System.out.println(" ");
+}
+if (cmd.equals("ALL") || cmd.equals("properties")) {
+System.out.println("  properties             Returns information about factomd, fctwallet,");			
+System.out.println("                         the Protocal version, the version of this CLI, and more.");			
 		
 System.out.println(" ");
 }

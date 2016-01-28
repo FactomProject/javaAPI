@@ -403,8 +403,12 @@ public class apiCalls {
 		String resp="";
 		
 		try {
-			
-			resp=utils.executeGet(fctwalletURL + "/v1/factoid-get-fee/?key=" + TransactionName);
+			if (TransactionName.equals("")) {
+				resp=utils.executeGet(fctwalletURL + "/v1/factoid-get-fee");				
+			} else {
+			resp=utils.executeGet(fctwalletURL + "/v1/factoid-get-fee/?key=" + TransactionName);				
+			}
+
 		} catch (Exception e) {
 			// this is only going to return an error on connectivity or some other communication error
 			e.printStackTrace();
@@ -413,6 +417,9 @@ public class apiCalls {
 		return resp;
 	} // end of GetFee
 	
+	
+	
+
 	//GetExchangeRate  - 
 	// takes transaction name
 	// returns amount (factoshi) that will be used in addfee.  so you know
@@ -431,7 +438,57 @@ public class apiCalls {
 	} // end of addOutput
 	
 	
+	
+	
+	
+	//GetFirstEntry
+	// get entry by hash
+	// Three steps
+	// use chainid to get chain head (merkle root)
+	// use the chain head to get the eblock 
+	// use eblock to get entry (with entry hash from eblock).
+	public static String GetFirstEntry(String chainid) {
+		String resp="";
+		String eblockmr=GetChainHead(chainid);
+		// not using json to be clear.  just stripping extra text from responses
+		
+		eblockmr=eblockmr.replace("{\"ChainHead\":\"","");
+		eblockmr=eblockmr.replace("\"}","");
+		
+		String eblock=GetEBlock(eblockmr);
 
+		
+		String EntryHash=eblock.substring(eblock.indexOf("EntryHash\":\"") + 12);
+		EntryHash=EntryHash.substring(0,EntryHash.indexOf("\""));
+		
+		
+		String entry=GetEntry(EntryHash);
+		resp= entry;	
+
+	
+	
+		return resp;
+	} // end of GetFirstEntry
+	
+	
+
+	//GetpROPERTIES  - 
+	// takes transaction name
+	// returns amount (factoshi) that will be used in addfee.  so you know
+	public static String GetProperties() {
+		String resp="";
+		
+		try {
+			
+			resp=utils.executeGet(fctwalletURL + "/v1/properties/");
+		} catch (Exception e) {
+			// this is only going to return an error on connectivity or some other communication error
+			e.printStackTrace();
+			resp="Error";
+		}
+		return resp;
+	} // end of addOutput
+	
 
 	//Get Transaction  - 
 	// Retuens information about the current pending transactions
@@ -580,37 +637,7 @@ public class apiCalls {
 	} // buyentrycreditsfulltransaction
 	
 	
-	
-	//GetFirstEntry
-	// get entry by hash
-	// Three steps
-	// use chainid to get chain head (merkle root)
-	// use the chain head to get the eblock 
-	// use eblock to get entry (with entry hash from eblock).
-	public static String GetFirstEntry(String chainid) {
-		String resp="";
-		String eblockmr=GetChainHead(chainid);
-		// not using json to be clear.  just stripping extra text from responses
-		
-		eblockmr=eblockmr.replace("{\"ChainHead\":\"","");
-		eblockmr=eblockmr.replace("\"}","");
-		
-		String eblock=GetEBlock(eblockmr);
 
-		
-		String EntryHash=eblock.substring(eblock.indexOf("EntryHash\":\"") + 12);
-		EntryHash=EntryHash.substring(0,EntryHash.indexOf("\""));
-		
-		
-		String entry=GetEntry(EntryHash);
-		resp= entry;	
-
-	
-	
-		return resp;
-	} // end of GetFirstEntry
-	
-	
 	
 	//SendFactoidsFullTransaction  - 
 	// takes input address/name
@@ -631,21 +658,13 @@ public class apiCalls {
 		
 		try {
 			resp=DeleteTransaction(transactionName);
-			//System.out.println(resp);	
 			resp=NewTransaction(transactionName);
-			//System.out.println(resp);	
 			resp=AddInput(transactionName,FromAddress,factoshi);
-			//System.out.println(resp);	
 			resp=AddOutput(transactionName,ToAddress,factoshi);
-			//System.out.println(resp);	
 			resp=GetFee(transactionName); //getfee without a transactionname gives entry credit exchange rate.  just a warning.
-			//System.out.println(resp);	
 			resp=AddFee(transactionName,FromAddress);
-			//System.out.println(resp);	
 			resp=SignTransaction(transactionName);
-			//System.out.println(resp);	
 			resp=SubmitTransaction(transactionName);
-			//System.out.println(resp);	
 			} catch (Exception e) {
 			// this is only going to return an error on connectivity or some other communication error
 			e.printStackTrace();
@@ -698,10 +717,10 @@ public class apiCalls {
 		postData=utils.appendByteArrays(postData,double256Chain );//chainid hash hash twice
 		postData=utils.appendByteArrays(postData, weld);	//commit weld
 		postData=utils.appendByteArrays(postData,e.entryHash );		//hash of first entry
-		postData=utils.appendByteToArray(postData, (byte)11);						//version
+		postData=utils.appendByteToArray(postData, (byte)11);						//cost
+		
 		
 		//rI could use a json marshal here, but I want the message format to be obvious.
-
 		postData=utils.appendByteArrays("{\"Message\":\"".getBytes(), postData);
 		postData=utils.appendByteArrays( postData,"\"}".getBytes());		
 		try {
@@ -753,7 +772,7 @@ public class apiCalls {
 		//now that everything is is, hash it
 		e.setEntryHash();
 		
-
+		// build commit
 		postData=utils.appendByteToArray(postData, (byte)0);			//version
 		postData=utils.appendByteArrays(postData, utils.MilliTime());	//millitime
 		if (e.entryHash == null) {
@@ -761,8 +780,9 @@ public class apiCalls {
 		}
 		postData=utils.appendByteArrays(postData, e.entryHash);	//hash of entry
 		postData=utils.appendByteToArray(postData, (byte)1);	//entry cost (entry content divided by 1k
-		System.out.println(utils.bytesToHex(postData));
-	    
+		//   send this to fctwallet for signing
+
+		
 		//rI could use a json marshal here, but I want the message format to be obvious.
 		postData=utils.appendByteArrays("{\"Message\":\"".getBytes(), postData);
 		postData=utils.appendByteArrays( postData,"\"}".getBytes());
@@ -818,7 +838,8 @@ public class apiCalls {
 				postData=utils.appendByteArrays(postData, e.ExtIDs [i]);
 		}
 		postData=utils.appendByteArrays(postData, e.Content);	//extid size (2 bytes)
-temp="{\"Entry\":\"" + utils.bytesToHex(postData) + "\"}";
+		
+		temp="{\"Entry\":\"" + utils.bytesToHex(postData) + "\"}";
 		//rI could use a json marshal here, but I want the message format to be obvious.		
 		postData=utils.appendByteArrays("{\"Entry\":\"".getBytes(), postData);
 		postData=utils.appendByteArrays( postData,"\"}".getBytes());
