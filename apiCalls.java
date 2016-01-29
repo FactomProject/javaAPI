@@ -713,11 +713,11 @@ public class apiCalls {
 	
 	// This does the transaction the hard way.  if your version of fctwallet has compose functionality, use that
 	
-	public static String ComposeChainCommit(String name, String[] extids,String chainID,String data) {
+	public static String ComposeChainCommit(String name, String[] extids,String data) {
 		String resp="";		
 		Chain c=new Chain();	
 		Entry e=new  Entry();	
-		e.setChainID(chainID);
+		//e.setChainID(chainID);
 		e.setExtIDs(extids);
 		e.Content =data.getBytes();
 		byte[] postData=new byte[0];
@@ -755,7 +755,8 @@ public class apiCalls {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-			resp=RevealChainOrEntry(e,"Entry");
+
+			resp=RevealChainOrEntry(e,"Chain");
 		} else {
 			
 		}

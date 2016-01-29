@@ -284,9 +284,7 @@ public class client {
 					} else if (loopFlag.equals("extid")){
 						extids=utils.appendStringToArray(extids,args[i]);
 					}
-					if (args[i].equals("-c")){
-						loopFlag="chain"; // next value is chainid
-					} else if (args[i].equals("-e")){
+					 if (args[i].equals("-e")){
 						loopFlag="extid";  // next value is exterior id
 					} else {
 						loopFlag="";  // this is a value not a flag.  next item is not e or c
@@ -295,7 +293,7 @@ public class client {
 
 				// semantics, but chain body is really 'entry body'
 				// chains don't have bodies. Entries do.  This also makes initial entry
-				test=apiCalls.ComposeChainCommit(paymentAddress,extids,chainid,chainBody);
+				test=apiCalls.ComposeChainCommit(paymentAddress,extids,chainBody);
 				test=getJsonResponseValue(test);
 				} catch (Exception e){
 					man(args[0]);
