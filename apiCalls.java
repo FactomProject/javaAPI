@@ -17,6 +17,7 @@ public class apiCalls {
 	 *
 	 */
 	
+	
 	static String fctwalletURL="http://localhost:8089";
 	static String factomdURL="http://localhost:8088";
 	
@@ -53,9 +54,7 @@ public class apiCalls {
 		if (FactoshiAmount < 0) {
 			return "{\"Response\":\"Negative Values Not Allowed.\",\"Success\":false}";
 		}
-		if (AddressName.length() > 32) {
-			return "{\"Response\":\"Addresses cannot be over 32 bytes\",\"Success\":false}";			
-		}
+
 		try {
 			resp=utils.executePost(fctwalletURL + "/v1/factoid-add-input/?key=" + TransactionName + "&name=" + AddressName + "&amount=" + FactoshiAmount,"");
 		} catch (Exception e) {
@@ -696,7 +695,7 @@ public class apiCalls {
 	// extids external ids as array of strings
 	//  data - data to be to blockchain entry
 	
-	// THIS IS CURRENTLY HAVING ISSUES.  RESPONDS CORRECTLY BUY CHAIN IS NOT PRESENT.  Update coming soon
+	// This does the transaction the hard way.  if your version of fctwallet has compose functionality, use that
 	
 	public static String ComposeChainCommit(String name, String[] extids,String chainID,String data) {
 		String resp="";		
@@ -758,7 +757,8 @@ public class apiCalls {
 	// accepts name: paying ec address
 	// extids external ids as array of strings
 	//  data - data to be to blockchain entry
-		
+	// This does the transaction the hard way.  if your version of fctwallet has compose functionality, use that
+	
   public static String ComposeEntryCommit(String name,String[] extids,String chainID,String data)  {
 	  	String resp="";
 

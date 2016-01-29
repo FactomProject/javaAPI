@@ -32,6 +32,7 @@ public class client {
 			if (args[0].equals("addfee")) {
 				try {
 					test=apiCalls.AddFee(args[1],args[2]);
+					test=getJsonResponseValue(test);
 				} catch (Exception e) {
 					test=man(args[0]);
 				}
@@ -44,8 +45,8 @@ public class client {
 					float f=Float.parseFloat(args[3]);
 					factoshi=Math.round(f*100000000);
 					test=apiCalls.AddInput(args[1],args[2],factoshi);
+					test=getJsonResponseValue(test);
 				} catch (Exception e) {
-					e.printStackTrace();
 					test=man(args[0]);
 				}				
 				
@@ -58,6 +59,7 @@ public class client {
 					float f=Float.parseFloat(args[3]);
 					factoshi=Math.round(f*100000000);
 					test=apiCalls.AddOutput(args[1],args[2],factoshi);
+					test=getJsonResponseValue(test);
 				} catch (Exception e) {
 					test=man(args[0]);
 				}					
@@ -71,6 +73,7 @@ public class client {
 					float f=Float.parseFloat(args[3]);
 					factoshi=Math.round(f*100000000);
 					test=apiCalls.AddECOutput(args[1],args[2],factoshi);
+					test=getJsonResponseValue(test);
 				} catch (Exception e) {
 					test=man(args[0]);
 				}					
@@ -78,6 +81,7 @@ public class client {
 			}
 			else if (args[0].equals("balance")) {
 				try {
+					String bal="";
 					if (args[1].equals("fct")){
 						test=apiCalls.GetFactoidBalance(args[2]);					
 					} else if (args[1].equals("ec")) {
@@ -85,6 +89,15 @@ public class client {
 					} else {
 						test=man(args[0]);					
 					}
+					
+					bal=getJsonResponseValue(test);  // all I care about is the number, not all json object
+					
+					if (args[1].equals("fct")){ //number is in factoshi
+					 test="Balance of " + args[2] + " = " + Float.parseFloat( bal) / 100000000.0;
+					} else {
+						 test="Balance of " + args[2] + " = " + bal;
+					}
+					
 
 				} catch (Exception e) {
 					test=man(args[0]);
@@ -94,7 +107,7 @@ public class client {
 			else if (args[0].equals("balances")) {
 				try {
 					test=apiCalls.GetAddresses();
-					test=formatGetAddress(test);
+					test=getJsonResponseValue(test);
 				} catch (Exception e) {
 					test=man(args[0]);
 				}	
@@ -111,14 +124,7 @@ public class client {
 				try {
 					test=apiCalls.DeleteTransaction(args[1]);
 
-					JSONTokener jt=new JSONTokener(test);
-					JSONObject jo=new JSONObject();
-					try {						
-						 jo=(JSONObject) jt.nextValue();
-						 test=jo.getString("Response");
-					} catch (Exception e) {
-						test=man(args[0]);
-					}	
+					test=getJsonResponseValue(test);
 				} catch (Exception e) {
 					test=man(args[0]);
 				}				
@@ -196,7 +202,7 @@ public class client {
 			else if (args[0].equals("getaddresses")) {
 				try {
 					test=apiCalls.GetAddresses();
-					test=formatGetAddress(test);
+					test=getJsonResponseValue(test);
 				} catch (Exception e) {
 					man(args[0]);
 				}				
@@ -205,6 +211,7 @@ public class client {
 			else if (args[0].equals("getexchangerate")) {
 				try {
 					test=apiCalls.GetExchangeRate();
+					test=getJsonResponseValue(test);
 				} catch (Exception e) {
 					man(args[0]);
 				}					
@@ -218,6 +225,7 @@ public class client {
 					} else {
 						test=apiCalls.GetFee(args[1]);					
 					}
+					test=getJsonResponseValue(test);
 				} catch (Exception e) {
 					man(args[0]);
 				}	
@@ -225,7 +233,8 @@ public class client {
 			
 			else if (args[0].equals("list")) {
 				try {
-					test=apiCalls.GetProcessedTransactions(args[1],"");					
+					test=apiCalls.GetProcessedTransactions(args[1],"");		
+					test=getJsonResponseValue(test);
 				} catch (Exception e){
 					man(args[0]);
 				}
@@ -293,7 +302,7 @@ public class client {
 						// not enough or too many command line arguments
 						man("newaddress");
 					}
-			          
+					test=getJsonResponseValue(test);
 					} catch (Exception e) {
 					  man("newaddress"); 	
 					}
@@ -301,6 +310,7 @@ public class client {
 			else if (args[0].equals("newtransaction")) {
 				try {
 					test=apiCalls.NewTransaction(args[1]);
+					test=getJsonResponseValue(test);
 				} catch (Exception e){
 					man(args[0]);
 				}
@@ -308,32 +318,8 @@ public class client {
 			else if (args[0].equals("properties")) {
 
 				try {
-
 						test=apiCalls.GetProperties();			
-
-						// parse the json response
-						// make it pretty for output
-						
-						JSONTokener jt=new JSONTokener(test);
-						JSONObject jo=new JSONObject();
-						try {							
-							 jo=(JSONObject) jt.nextValue();
-							 if (jo.getBoolean("Success")) {
-							 String Response=jo.getString("Response");
-							// replace "\n newlines with system independent character
-							 	Response=Response.replaceAll("\n",System.getProperty("line.separator"));
-							 	test=Response;
-							 } else {
-								 test="Properties Not Available"; 
-							 }
-
-						} catch (Exception e) {
-							e.printStackTrace();
-							test="Properties Not Available";
-						}
-				
-						
-
+						test=getJsonResponseValue(test);
 				} catch (Exception e) {
 					man(args[0]);
 				}	
@@ -382,6 +368,7 @@ public class client {
 			else if (args[0].equals("sign")) {
 				try {
 					test=apiCalls.SignTransaction(args[1]);
+					test=getJsonResponseValue(test);
 				} catch (Exception e){
 					man(args[0]);
 				}
@@ -389,6 +376,7 @@ public class client {
 			else if (args[0].equals("submit")) {
 				try {
 					test=apiCalls.SubmitTransaction(args[1]);
+					test=getJsonResponseValue(test);					
 				} catch (Exception e){
 					man(args[0]);
 				}
@@ -396,6 +384,7 @@ public class client {
 			else if (args[0].equals("transactions")) {
 				try {
 						test=apiCalls.GetTransactions();
+						test=getJsonResponseValue(test);						
 				} catch (Exception e){
 					man(args[0]);
 				}
@@ -602,22 +591,7 @@ return " "; // this is just managing the test println in main.
 }  //man
 
 
-private static String formatGetAddress(String json){
-	String resp="";
-	try {
-	if (json.indexOf("Success\":true}") > 0 ){
-	resp=json.replace("{\"Response\":\"","");
-	resp=resp.replace("\",\"Success\":true}","");
-	resp=resp.replace("\\n", System.lineSeparator() );
-	} else {
-		return json;
-	}
-	} catch (Exception e) {
-		resp=e.getMessage();
-	}
-	
-	return resp;
-}
+
 
 private static String printEntry(String jsonEntry){
 
@@ -654,5 +628,22 @@ private static String printEntry(String jsonEntry){
 
 	return prettyResponse;
 }
+
+
+// this removes everything but the json "Response" 
+  private static String getJsonResponseValue(String json) {
+	  String resp="";
+		JSONTokener jt=new JSONTokener(json);
+		JSONObject jo=new JSONObject();
+		try {						
+			 jo=(JSONObject) jt.nextValue();
+			 resp=jo.getString("Response");
+		} catch (Exception e) {
+			
+		}
+		
+		return resp;	   
+  }
+  
 
 }
