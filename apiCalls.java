@@ -628,17 +628,24 @@ public class apiCalls {
 		factoshi= factoshi * 100000000;  // convert to factoshi (1 factoshi=1/100000000 factoid)
 		
 	
-		factoshi=(int) (Amount * 100000000);  // convert to factoshi (1 factoshi=1/100000000 factoid)
+
 		
 		try {
 			resp=DeleteTransaction(transactionName);
+			if (resp.indexOf("\"Success\":true") == 0) { return resp; }
 			resp=NewTransaction(transactionName);
+			if (resp.indexOf("\"Success\":true") == 0) { return resp; }			
 			resp=AddInput(transactionName,FromAddress,factoshi);
+			if (resp.indexOf("\"Success\":true") == 0) { return resp; }			
 			resp=AddECOutput(transactionName,ToAddress,factoshi);
+			if (resp.indexOf("\"Success\":true") == 0) { return resp; }			
 			resp=GetFee(transactionName); //getfee without a transactionname gives entry credit exchange rate.  just a warning.
 			resp=AddFee(transactionName,FromAddress);
+			if (resp.indexOf("\"Success\":true") == 0) { return resp; }
 			resp=SignTransaction(transactionName);
+			if (resp.indexOf("\"Success\":true") == 0) { return resp; }
 			resp=SubmitTransaction(transactionName);
+			
 		} catch (Exception e) {
 			// this is only going to return an error on connectivity or some other communication error
 			e.printStackTrace();
@@ -671,12 +678,18 @@ public class apiCalls {
 		
 		try {
 			resp=DeleteTransaction(transactionName);
+			if (resp.indexOf("\"Success\":true") == 0) { return resp; }
 			resp=NewTransaction(transactionName);
+			if (resp.indexOf("\"Success\":true") == 0) { return resp; }
 			resp=AddInput(transactionName,FromAddress,factoshi);
+			if (resp.indexOf("\"Success\":true") == 0) { return resp; }
 			resp=AddOutput(transactionName,ToAddress,factoshi);
+			if (resp.indexOf("\"Success\":true") == 0) { return resp; }
 			resp=GetFee(transactionName); //getfee without a transactionname gives entry credit exchange rate.  just a warning.
 			resp=AddFee(transactionName,FromAddress);
+			if (resp.indexOf("\"Success\":true") == 0) { return resp; }
 			resp=SignTransaction(transactionName);
+			if (resp.indexOf("\"Success\":true") == 0) { return resp; }
 			resp=SubmitTransaction(transactionName);
 			} catch (Exception e) {
 			// this is only going to return an error on connectivity or some other communication error

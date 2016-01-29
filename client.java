@@ -115,6 +115,7 @@ public class client {
 			else if (args[0].equals("buyentrycredits")) {
 				try {
 					test=apiCalls.BuyEntryCreditsFullTransaction(args[1],args[2],Float.parseFloat(args[3]));
+					test=getJsonResponseValue(test);
 				} catch (Exception e) {
 					test=man(args[0]);
 				}					
@@ -135,9 +136,11 @@ public class client {
 					
 					if (args[1].equals("head")) {
 						test=apiCalls.GetDBlockHead();
+						test=getJsonResponseValue(test);
 					}
 					else if (args[1].equals("height")) {
 						test=apiCalls.GetDBlockHeight();
+						test=getJsonResponseValue(test);
 					}
 					else if (args[1].equals("dblock")) {
 						if (args[2].equals("keymr")){
@@ -146,7 +149,9 @@ public class client {
 							test=apiCalls.GetDBlock(args[2]);	
 							if (test.indexOf("response code: 400") > 0 ) {  //400 is a valid not found response in this case
 								test="Directory Block Not Found.";
-							}							
+							}		else {
+								test=getJsonResponseValue(test);
+							}
 						}
 	
 					}
@@ -157,6 +162,8 @@ public class client {
 							test=apiCalls.GetChainHead(args[2]);		
 							if (test.indexOf("response code: 400") > 0 ) {  //400 is a valid not found response in this case
 								test="Chain Not Found.";
+							} else {
+								test=getJsonResponseValue(test);
 							}
 						}
 	
@@ -168,7 +175,10 @@ public class client {
 							test=apiCalls.GetEBlock(args[2]);		
 							if (test.indexOf("response code: 400") > 0 ) {  //400 is a valid not found response in this case
 								test="Entry Block Not Found.";
+							} else {
+								test=getJsonResponseValue(test);								
 							}
+
 						}
 	
 					}
@@ -193,7 +203,7 @@ public class client {
 							test=printEntry(test);
 							
 						}
-	
+
 					}
 				} catch (Exception e) {
 					test=man(args[0]);
@@ -280,6 +290,7 @@ public class client {
 				// semantics, but chain body is really 'entry body'
 				// chains don't have bodies. Entries do.  This also makes initial entry
 				test=apiCalls.ComposeChainCommit(paymentAddress,extids,chainid,chainBody);
+				test=getJsonResponseValue(test);
 				} catch (Exception e){
 					man(args[0]);
 				}
@@ -364,8 +375,14 @@ public class client {
 					} catch (Exception e){
 						man(args[0]);
 				}
-			}
-			else if (args[0].equals("sign")) {
+			} else if (args[0].equals("sendfactoids")) {
+				try {
+					test=apiCalls.SendFactoidsFullTransaction(args[1],args[2],Float.parseFloat(args[3]));
+					test=getJsonResponseValue(test);
+				} catch (Exception e){
+					man(args[0]);
+				}
+			} else if (args[0].equals("sign")) {
 				try {
 					test=apiCalls.SignTransaction(args[1]);
 					test=getJsonResponseValue(test);
@@ -389,13 +406,7 @@ public class client {
 					man(args[0]);
 				}
 			}
-			else if (args[0].equals("sendfactoids")) {
-				try {
-					test=apiCalls.SendFactoidsFullTransaction(args[1],args[2],Float.parseFloat(args[3]));
-				} catch (Exception e){
-					man(args[0]);
-				}
-			} else if (args[0].equals("verifyaddress")) {
+			else if (args[0].equals("verifyaddress")) {
 					try {
 						test=apiCalls.verifyAddress(args[1]);
 						JSONTokener jt=new JSONTokener(test);
@@ -455,7 +466,7 @@ System.out.println("     -c [chainid]        Specify the chain that the entry be
 System.out.println(" ");	
 }
 if (cmd.equals("ALL") || cmd.equals("newaddress") || cmd.equals("generateaddress")) {
-System.out.println("  new address or");
+System.out.println("  newaddress or");
 System.out.println("  generateaddress        Generate addresses, giving them names.");
 System.out.println("     ec name             Generate an Entry Credit address, tied to the name.");
 System.out.println("     fct name            Generate a factoid address, tied to the name.");
