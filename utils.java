@@ -226,6 +226,14 @@ public class utils {
 			temp[ary.length]=bt;
 			return temp;
 		}		
+		
+		public static String[] appendStringToArray(String[] ary,String bt){
+			String[] temp=new String[ary.length + 1];
+			System.arraycopy(ary, 0, temp, 0, ary.length);
+			temp[ary.length]=bt;
+			return temp;
+		}	
+		
 		public static String bytesToHex( byte [] raw ) {
 			String HexCharacters = "0123456789ABCDEF";
 		    if ( raw == null ) {

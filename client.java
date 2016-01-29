@@ -3,6 +3,7 @@
  */
 package Factom;
 
+
 import java.util.Scanner;
 
 import org.json.JSONArray;
@@ -22,7 +23,6 @@ public class client {
 	 *  for usage run man
 	 */
 	public static void main(String[] args) {
-		
 
 		String test=""; 
 	
@@ -171,6 +171,7 @@ public class client {
 							System.out.println("Please enter an entry hash, not 'hash'");
 						} else {
 							test=apiCalls.GetEntry(args[2]);
+							test=printEntry(test);
 							if (test.indexOf("response code: 400") > 0 ) {  //400 is a valid not found response in this case
 								test="Entry Hash Not Found.";
 							}	
@@ -183,39 +184,7 @@ public class client {
 						} else {
 							test=apiCalls.GetFirstEntry(args[2]);	
 							
-							
-							
-							// parse the json response from getFirstEntry
-							// make it pretty for output
-							
-							JSONArray ExtIDs=new JSONArray();
-							JSONTokener jt=new JSONTokener(test);
-							JSONObject jo=new JSONObject();
-							try {							
-								 String prettyResponse="";
-								 String content="";
-	
-								 jo=(JSONObject) jt.nextValue();
-								 String chainID=jo.getString("ChainID");
-								 prettyResponse="ChainID:" + chainID;
-								 content= jo.getString("Content");
-	
-									 
-								 String thisExtID="";
-								 ExtIDs=jo.getJSONArray("ExtIDs");
-								 for (int i=0;i<ExtIDs.length();i++) {
-									 thisExtID=ExtIDs.get(i).toString();
-									
-									 prettyResponse += "\nExtID:" + new String (utils.hexToBytes(thisExtID),"UTF-8");
-								 }
-								 prettyResponse += "\nContent:" + new String (utils.hexToBytes(content),"UTF-8");
-								 test=prettyResponse;
-						
-							} catch (Exception e) {
-								e.printStackTrace();
-								test= "Entry Not Found";
-							}
-					
+							test=printEntry(test);
 							
 						}
 	
@@ -253,39 +222,7 @@ public class client {
 					man(args[0]);
 				}	
 			}
-			else if (args[0].equals("properties")) {
-
-				try {
-
-						test=apiCalls.GetProperties();			
-
-						// parse the json response
-						// make it pretty for output
-						
-						JSONTokener jt=new JSONTokener(test);
-						JSONObject jo=new JSONObject();
-						try {							
-							 jo=(JSONObject) jt.nextValue();
-							 if (jo.getBoolean("Success")) {
-							 String Response=jo.getString("Response");
-							// replace "\n newlines with system independent character
-							 	Response=Response.replaceAll("\n",System.getProperty("line.separator"));
-							 	test=Response;
-							 } else {
-								 test="Properties Not Available"; 
-							 }
-
-						} catch (Exception e) {
-							e.printStackTrace();
-							test="Properties Not Available";
-						}
-				
-						
-
-				} catch (Exception e) {
-					man(args[0]);
-				}	
-			}
+			
 			else if (args[0].equals("list")) {
 				try {
 					test=apiCalls.GetProcessedTransactions(args[1],"");					
@@ -307,12 +244,33 @@ public class client {
 			    	}
 
 			    }
-			System.out.println("out of stdin");
+			    System.out.println("out of stdin");
 				stdin.close();
-			    //args[1] is the payment address
+			    //last arg is payment address is the payment address
+				String paymentAddress=args[args.length-1 ];
+				//loop through commandline args looking for -c or -e
+				String loopFlag="";
+				String chainid="";
+
+				String[] extids=new String[0];
+				for (int i=0;i<args.length-1;i++){
+					if (loopFlag.equals("chain")){
+						chainid=args[i];
+					} else if (loopFlag.equals("extid")){
+						extids=utils.appendStringToArray(extids,args[i]);
+					}
+					if (args[i].equals("-c")){
+						loopFlag="chain"; // next value is chainid
+					} else if (args[i].equals("-e")){
+						loopFlag="extid";  // next value is exterior id
+					} else {
+						loopFlag="";  // this is a value not a flag.  next item is not e or c
+					}
+				}
+
 				// semantics, but chain body is really 'entry body'
 				// chains don't have bodies. Entries do.  This also makes initial entry
-				test=apiCalls.ComposeChainCommit(args[1],args,chainBody);
+				test=apiCalls.ComposeChainCommit(paymentAddress,extids,chainid,chainBody);
 				} catch (Exception e){
 					man(args[0]);
 				}
@@ -347,6 +305,39 @@ public class client {
 					man(args[0]);
 				}
 			}
+			else if (args[0].equals("properties")) {
+
+				try {
+
+						test=apiCalls.GetProperties();			
+
+						// parse the json response
+						// make it pretty for output
+						
+						JSONTokener jt=new JSONTokener(test);
+						JSONObject jo=new JSONObject();
+						try {							
+							 jo=(JSONObject) jt.nextValue();
+							 if (jo.getBoolean("Success")) {
+							 String Response=jo.getString("Response");
+							// replace "\n newlines with system independent character
+							 	Response=Response.replaceAll("\n",System.getProperty("line.separator"));
+							 	test=Response;
+							 } else {
+								 test="Properties Not Available"; 
+							 }
+
+						} catch (Exception e) {
+							e.printStackTrace();
+							test="Properties Not Available";
+						}
+				
+						
+
+				} catch (Exception e) {
+					man(args[0]);
+				}	
+			}
 			else if (args[0].equals("put")) {
 				try {
 				    Scanner stdin = new Scanner(System.in);
@@ -361,9 +352,29 @@ public class client {
 				    	}
 				    }
 				System.out.println("out of stdin");
-					stdin.close();
-				    //args[1] is the payment address
-					test=apiCalls.ComposeEntryCommit(args[1],args,entryBody);
+				stdin.close();
+				 //last arg is payment address is the payment address
+				String paymentAddress=args[args.length-1 ];
+				//loop through commandline args looking for -c or -e
+				String loopFlag="";
+				String chainid="";
+
+				String[] extids=new String[0];
+				for (int i=0;i<args.length-1;i++){
+					if (loopFlag.equals("chain")){
+						chainid=args[i];
+					} else if (loopFlag.equals("extid")){
+						extids=utils.appendStringToArray(extids,args[i]);
+					}
+					if (args[i].equals("-c")){
+						loopFlag="chain"; // next value is chainid
+					} else if (args[i].equals("-e")){
+						loopFlag="extid";  // next value is exterior id
+					} else {
+						loopFlag="";  // this is a value not a flag.  next item is not e or c
+					}
+				}
+					test=apiCalls.ComposeEntryCommit(paymentAddress,extids,chainid,entryBody);
 					} catch (Exception e){
 						man(args[0]);
 				}
@@ -520,7 +531,7 @@ System.out.println("                         to odd behavior.");
 System.out.println(" ");	
 }
 if (cmd.equals("ALL") || cmd.equals("getExchangeRate")) {
-System.out.println("  etexchangerate         Get the current exchange rate for");			
+System.out.println("  getexchangerate        Get the current exchange rate for");			
 System.out.println("                         factoids to Entry Credits");			
 
 System.out.println(" ");	
@@ -606,6 +617,42 @@ private static String formatGetAddress(String json){
 	}
 	
 	return resp;
+}
+
+private static String printEntry(String jsonEntry){
+
+	// parse the json response from getFirstEntry
+	// make it pretty for output
+	String prettyResponse="";
+	JSONArray ExtIDs=new JSONArray();
+	JSONTokener jt=new JSONTokener(jsonEntry);
+	JSONObject jo=new JSONObject();
+	try {							
+		
+		 String content="";
+
+		 jo=(JSONObject) jt.nextValue();
+		 String chainID=jo.getString("ChainID");
+		 prettyResponse="ChainID:" + chainID;
+		 content= jo.getString("Content");
+
+			 
+		 String thisExtID="";
+		 ExtIDs=jo.getJSONArray("ExtIDs");
+		 for (int i=0;i<ExtIDs.length();i++) {
+			 thisExtID=ExtIDs.get(i).toString();
+			
+			 prettyResponse += "\nExtID:" + new String (utils.hexToBytes(thisExtID),"UTF-8");
+		 }
+		 prettyResponse += "\nContent:" + new String (utils.hexToBytes(content),"UTF-8");
+
+
+	} catch (Exception e) {
+		e.printStackTrace();
+		prettyResponse= "Entry Not Found";
+	}
+
+	return prettyResponse;
 }
 
 }

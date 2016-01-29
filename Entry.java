@@ -12,55 +12,27 @@ public  class Entry {
 		 byte[][] ba=new byte[eidlen][];
 		 eidlen=0;
 		 byte[] item;
-		 boolean flg=false;
 		 for (int i=0 ; i < extIDs.length ;i++) {
-			 if (flg) { //only use items after a -e
 				 item=extIDs[i].getBytes();
-				 ba[eidlen]=item;
-				
-				 eidlen=eidlen+1;
-			 }
-			 if (extIDs[i].equals("-e")) {
-				 flg=true;
-			 } else {
-				 flg=false;
-			 }
+				 ba[eidlen]=item;				
+				 eidlen=eidlen+1;		 
 		 }
-		 //all ba array spots weren't used.  trim it to only have valid extid
-		 byte[][] resp=new byte[eidlen][];
-		 for (int i=0 ; i < eidlen ;i++) {
-			 resp[i]=ba[i];
-		 }	 
-		 ExtIDs=resp;
-		
+		 ExtIDs=ba;	
 	}
 	
 	
 	
-	public void setChainID(String[] args) {
-		 byte[] item;
-		 boolean flg=false;
-		 for (int i=0 ; i < args.length ;i++) {
-			 if (flg) { //only use items after a -e
-				 item=utils.hexToBytes(args[i]);
-				 
-				 ChainID=item;
-				 System.out.println("Chain=" + utils.bytesToHex(ChainID));
-			 }
-			 if (args[i].equals("-c")) {
-				 flg=true;
-			 } else {
-				 flg=false;
-			 }
-		 }
+	public void setChainID(String chain) {
+				 ChainID=utils.hexToBytes(chain);
 	}
 	
 	public void createChainID() {
 		byte[] buildHash=new byte[0];
 		
 		if (ExtIDs.length == 0) {
-			//System.out.println("That Chain ID exists already.  Please adjust External IDs to create unique initial Chain ID");
-			//System.exit(1);
+			// you have to have external IDs
+			System.out.println("That Chain ID exists already.  Please adjust External IDs to create unique initial Chain ID");
+			System.exit(1);
 		}
 		 
 		 for (int i=0 ; i < ExtIDs.length ;i++) {
@@ -104,6 +76,11 @@ public  class Entry {
 			return resp;			
 	}
 	
+	// and entry has is the whole entry as a byte string.
+	// hash that with sha512
+	// append the entrybytes to that 512 hash
+	// hash that new byte array with sha256
+	
 	public void setEntryHash() {
 		byte[] resp;
 		
@@ -111,12 +88,7 @@ public  class Entry {
 		resp=utils.sha256Bytes(utils.appendByteArrays(utils.sha512Bytes(entrybytes),entrybytes));
 		
 		entryHash= resp;
-		
-		  try {
-			  System.out.println("content:" + new String(Content , "UTF-8") );
-			  } catch (Exception exc){
-				  
-			  }
+
 	}
 
 }

@@ -57,7 +57,6 @@ public class apiCalls {
 			return "{\"Response\":\"Addresses cannot be over 32 bytes\",\"Success\":false}";			
 		}
 		try {
-			System.out.println(fctwalletURL + "/v1/factoid-add-input/?key=" + TransactionName + "&name=" + AddressName + "&amount=" + FactoshiAmount);
 			resp=utils.executePost(fctwalletURL + "/v1/factoid-add-input/?key=" + TransactionName + "&name=" + AddressName + "&amount=" + FactoshiAmount,"");
 		} catch (Exception e) {
 			// this is only going to return an error on connectivity or some other communication error
@@ -684,8 +683,7 @@ public class apiCalls {
 			// this is only going to return an error on connectivity or some other communication error
 			e.printStackTrace();
 		
-			//System.out.println(resp);
-			
+				
 		}
 		return resp;
 	} // addInput
@@ -700,32 +698,25 @@ public class apiCalls {
 	
 	// THIS IS CURRENTLY HAVING ISSUES.  RESPONDS CORRECTLY BUY CHAIN IS NOT PRESENT.  Update coming soon
 	
-	public static String ComposeChainCommit(String name, String[] extids,String data) {
+	public static String ComposeChainCommit(String name, String[] extids,String chainID,String data) {
 		String resp="";		
 		Chain c=new Chain();	
 		Entry e=new  Entry();	
-		e.setChainID(extids);
+		e.setChainID(chainID);
 		e.setExtIDs(extids);
 		e.Content =data.getBytes();
 		byte[] postData=new byte[0];
 		// put external IDs in entry
 		byte[] weld;
 		byte[] double256Chain;
+		
 		//put content into entry		
-
 		c.setFirstEntry(e);
 		e.setEntryHash();
 		
 		
 		double256Chain=utils.sha256Bytes(utils.sha256Bytes(c.ChainID));
-		
 		weld=utils.sha256Bytes(utils.sha256Bytes(utils.appendByteArrays(e.entryHash , c.ChainID)));
-		System.out.println("chain:" + utils.bytesToHex(e.ChainID));
-		System.out.println("double256chain:" + utils.bytesToHex(double256Chain));
-		System.out.println("entryhash:" + utils.bytesToHex(e.entryHash));
-		System.out.println("WELD:" + utils.bytesToHex(weld));
-
-
 
 		postData=utils.appendByteToArray(postData, (byte)0);						//version
 		postData=utils.appendByteArrays(postData,utils. MilliTime());		//millitime
@@ -736,24 +727,20 @@ public class apiCalls {
 		
 		
 		//rI could use a json marshal here, but I want the message format to be obvious.
-		postData=utils.appendByteArrays("{\"Message\":\"".getBytes(), postData);
-		postData=utils.appendByteArrays( postData,"\"}".getBytes());		
-		try {
-			System.out.println(new String(postData,"UTF-8"));
-		}catch (Exception dontcare) {
-			
-		}	
-		resp=utils.executePostBytes(fctwalletURL + "/v1/commit-chain/" + name,postData);
-		//System.out.println("Aborting reveal");
-		//System.exit(1);
+		String jsonPost="{\"Message\":\"" + utils.bytesToHex(postData).toLowerCase() + "\"}";
+		
+		
+		resp=utils.executePost(fctwalletURL + "/v1/commit-chain/" + name,jsonPost);
+
 		if ( resp.equals("200")){
-			System.out.println("waiting 10 seconds before calling reveal");
+			System.out.println("waiting 10 seconds before calling reveal.");
+			System.out.println("Milestone 2 will have receipts making this redundant.");
 			try{
 			Thread.sleep(10000);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-			resp=RevealChainOrEntry(e,"Chain");
+			resp=RevealChainOrEntry(e,"Entry");
 		} else {
 			
 		}
@@ -772,15 +759,15 @@ public class apiCalls {
 	// extids external ids as array of strings
 	//  data - data to be to blockchain entry
 		
-  public static String ComposeEntryCommit(String name,String[] extids,String data)  {
-	  String resp="";
+  public static String ComposeEntryCommit(String name,String[] extids,String chainID,String data)  {
+	  	String resp="";
 
 		byte[] postData=new byte[0];
 
 		Entry e=new Entry();
 		
 		// change this.  it is client.java specific and looking for -c and -e
-		e.setChainID(extids);
+		e.setChainID(chainID);
 		e.setExtIDs(extids);
 		e.Content = data.getBytes();
 		
@@ -797,25 +784,19 @@ public class apiCalls {
 		postData=utils.appendByteToArray(postData, (byte)1);	//entry cost (entry content divided by 1k
 		//   send this to fctwallet for signing
 
-		
+		String temp="{\"Message\":\"" + utils.bytesToHex(postData) + "\"}";
 		//rI could use a json marshal here, but I want the message format to be obvious.
-		postData=utils.appendByteArrays("{\"Message\":\"".getBytes(), postData);
-		postData=utils.appendByteArrays( postData,"\"}".getBytes());
-	
-		try{
-	        System.out.println(new String(postData,"UTF-8"));
-		
-		} catch (Exception dontcare){
-			
-		}
 
-		resp=utils.executePostBytes(fctwalletURL + "/v1/commit-entry/" + name,postData);
+		resp=utils.executePost(fctwalletURL + "/v1/commit-entry/" + name,temp);
 
 		if ( resp.equals("200")){
 			System.out.println("waiting 10 seconds before calling reveal");
+			System.out.println("Milestone 2 will have receipts making this redundant.");
 			try{
-			Thread.sleep(10000);
+				Thread.sleep(10000);
 			} catch (Exception ex) {
+			// this should never happen
+				ex.printStackTrace();
 				
 			}
 			resp=RevealChainOrEntry(e,"Entry");
@@ -847,7 +828,9 @@ public class apiCalls {
 		for (i=0;i<e.ExtIDs .length ;i++){
 			extidlength=extidlength + e.ExtIDs[i].length + 2;
 		}
+		
 		postData=utils.appendByteArrays(postData,  utils.IntToByteArray(extidlength ));	//extid size (2 bytes) length of all extid data + item counts
+		
 		for ( i=0;i< e.ExtIDs .length ;i++){  //add each ext id
 				postData=utils.appendByteArrays(postData, utils.IntToByteArray(e.ExtIDs[i].length ) );				//extid size (2 bytes)
 				postData=utils.appendByteArrays(postData, e.ExtIDs [i]);
@@ -855,22 +838,20 @@ public class apiCalls {
 		postData=utils.appendByteArrays(postData, e.Content);	//extid size (2 bytes)
 		
 		temp="{\"Entry\":\"" + utils.bytesToHex(postData) + "\"}";
+		
 		//rI could use a json marshal here, but I want the message format to be obvious.		
 		postData=utils.appendByteArrays("{\"Entry\":\"".getBytes(), postData);
 		postData=utils.appendByteArrays( postData,"\"}".getBytes());
-		try {
-			System.out.println(new String(postData,"UTF-8"));
-		}catch (Exception dontcare) {
-			
-		}
-		
+
+
 		if (RevealType=="Chain"){
 			resp=utils.executePost(factomdURL + "/v1/reveal-chain/",temp);
+			    System.out.println("Chain ID: " + utils.bytesToHex(e.ChainID));
 		} else if (RevealType=="Entry"){
 			resp=utils.executePost(factomdURL + "/v1/reveal-entry/",temp);
-				
+				System.out.println("Entry Hash: " + utils.bytesToHex(e.entryHash));
 		}
-		System.out.println("resp=" + resp);
+
 		
 		
 		return resp;    
