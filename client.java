@@ -272,20 +272,20 @@ public class client {
 			    System.out.println("out of stdin");
 				stdin.close();
 			    //last arg is payment address is the payment address
-				String paymentAddress=args[args.length-1 ];
+				String paymentAddress="";//=args[args.length-1 ];
 				//loop through commandline args looking for -c or -e
 				String loopFlag="";
-				String chainid="";
 
 				String[] extids=new String[0];
-				for (int i=0;i<args.length-1;i++){
-					if (loopFlag.equals("chain")){
-						chainid=args[i];
-					} else if (loopFlag.equals("extid")){
+				for (int i=0;i<args.length;i++){
+					if (loopFlag.equals("extid")){
 						extids=utils.appendStringToArray(extids,args[i]);
 					}
 					 if (args[i].equals("-e")){
 						loopFlag="extid";  // next value is exterior id
+					} else if (loopFlag.equals("") && (i > 0)) {
+						//lo flag set and it isnt a flag, so it must be the paying address
+						paymentAddress=args[i];
 					} else {
 						loopFlag="";  // this is a value not a flag.  next item is not e or c
 					}
@@ -301,31 +301,39 @@ public class client {
 			}
 			else if (args[0].equals("newaddress") || args[0].equals("generateaddress")) {
 				try { // if the correct number of arguments are not sent, call man
-					if (args.length == 3) {
-					  if (args[1].toLowerCase().equals("fct")){
-						  test=apiCalls.GenerateFactoidAddress(args[2]);
-					  } else if (args[1].toLowerCase().equals("ec")){
-						  test=apiCalls.GenerateEntryCreditAddress(args[2]);
-					  }
-					} else if (args.length == 4) {
-						  if (args[1].toLowerCase().equals("fct")){
-							  test=apiCalls.GenerateAddressFromHumanReadablePrivateKey(args[2],args[3]);
-						  } else if (args[1].toLowerCase().equals("ec")){
-							  test=apiCalls.GenerateEntryCreditAddressFromHumanReadablePrivateKey(args[2],args[3]);
-						  }					   
+					if (!(args[2].matches("[a-zA-Z0-9-_]+"))) {
+						test="Invalid characters in " + args[2];
 					} else {
-						// not enough or too many command line arguments
-						man("newaddress");
+						if (args.length == 3) {
+						  if (args[1].toLowerCase().equals("fct")){
+							  test=apiCalls.GenerateFactoidAddress(args[2]);
+						  } else if (args[1].toLowerCase().equals("ec")){
+							  test=apiCalls.GenerateEntryCreditAddress(args[2]);
+						  }
+						} else if (args.length == 4) {
+							  if (args[1].toLowerCase().equals("fct")){
+								  test=apiCalls.GenerateAddressFromHumanReadablePrivateKey(args[2],args[3]);
+							  } else if (args[1].toLowerCase().equals("ec")){
+								  test=apiCalls.GenerateEntryCreditAddressFromHumanReadablePrivateKey(args[2],args[3]);
+							  }					   
+						} else {
+							// not enough or too many command line arguments
+							man("newaddress");
+						}
+						test=getJsonResponseValue(test);
 					}
-					test=getJsonResponseValue(test);
 					} catch (Exception e) {
 					  man("newaddress"); 	
 					}
 			}
 			else if (args[0].equals("newtransaction")) {
 				try {
+					if (!(args[2].matches("[a-zA-Z0-9-_]+"))) {
+						test="Invalid characters in " + args[2];
+					} else {
 					test=apiCalls.NewTransaction(args[1]);
 					test=getJsonResponseValue(test);
+					}
 				} catch (Exception e){
 					man(args[0]);
 				}
@@ -355,13 +363,13 @@ public class client {
 				System.out.println("out of stdin");
 				stdin.close();
 				 //last arg is payment address is the payment address
-				String paymentAddress=args[args.length-1 ];
+				String paymentAddress="";
 				//loop through commandline args looking for -c or -e
 				String loopFlag="";
 				String chainid="";
 
 				String[] extids=new String[0];
-				for (int i=0;i<args.length-1;i++){
+				for (int i=0;i<args.length;i++){
 					if (loopFlag.equals("chain")){
 						chainid=args[i];
 					} else if (loopFlag.equals("extid")){
@@ -371,6 +379,8 @@ public class client {
 						loopFlag="chain"; // next value is chainid
 					} else if (args[i].equals("-e")){
 						loopFlag="extid";  // next value is exterior id
+					} else if (loopFlag.equals("") && i > 0){
+						paymentAddress=args[i];
 					} else {
 						loopFlag="";  // this is a value not a flag.  next item is not e or c
 					}

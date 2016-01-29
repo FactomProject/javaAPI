@@ -269,10 +269,14 @@ public class utils {
 		}
 		
 	  public static boolean isAlphaNumeric(String check) {
-		  boolean resp=false;
-		//  "^[a-zA-Z0-9]*$"
-		//  resp=regex[]
-		  return resp;
+	
+		if (check.matches("[a-zA-Z0-9]")) {
+			return true;
+		} else {
+			return false;
+		}
+
+	
 	  }
 	
 
