@@ -4,6 +4,10 @@
 package Factom;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.Scanner;
 
 import org.json.JSONArray;
@@ -23,6 +27,8 @@ public class client {
 	 *  for usage run man
 	 */
 	public static void main(String[] args) {
+		
+		readconfig();
 
 		String test=""; 
 	
@@ -656,5 +662,45 @@ private static String printEntry(String jsonEntry){
 		return resp;	   
   }
   
+	private static void readconfig(){
+		String fctwalletPort="NONE";
+		String fctwalletIP="NONE";
+		String factomdPort="NONE";
+		String factomdIP="NONE";
+ 
+		File f = new File(System.getProperty("user.home") + "\\.factom\\factomd.conf");
+		if(f.exists() && !f.isDirectory()) { 
+			try {
+			  Properties prop = new Properties();
+			    InputStream is = new FileInputStream(System.getProperty("user.home") + "\\.factom\\factomd.conf");
+			    prop.load(is);
 
+			    factomdIP=prop.getProperty("FactomdAddress");
+			    factomdPort=prop.getProperty("FactomdPort");
+			    fctwalletIP=prop.getProperty("Address");
+			    fctwalletPort=prop.getProperty("Port");
+			    
+			    if ((fctwalletPort.equals("NONE")) || (fctwalletIP.equals("NONE")) || (factomdPort.equals("NONE")) || (factomdIP.equals("NONE")) ) {
+			     	System.out.println("problem with config file");
+			     	System.out.println("(" + System.getProperty("user.home") + "\\.factom\\factomd.conf" + ")");
+			     	System.out.println("leaving defaults as:");
+			     	System.out.println("factomd location: " + apiCalls.factomdURL);
+			     	System.out.println("fctwallet location: " + apiCalls.fctwalletURL);
+				} else {
+					apiCalls.factomdURL="http://" + factomdIP + ":" + factomdPort;
+					apiCalls.fctwalletURL="http://" + fctwalletIP + ":" + fctwalletPort;
+					
+				}
+
+			} catch (Exception e){
+		     	System.out.println("problem with config file");
+		     	System.out.println("(" + System.getProperty("user.home") + "\\.factom\\factomd.conf" + ")");
+		     	System.out.println("leaving defaults as:");
+		     	System.out.println("factomd location: " + apiCalls.factomdURL);
+		     	System.out.println("fctwallet location: " + apiCalls.fctwalletURL);
+			}
+		} else {
+			//leave url paths to default
+		}
+	}
 }

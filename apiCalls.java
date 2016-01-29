@@ -18,8 +18,8 @@ public class apiCalls {
 	 */
 	
 	
-	static String fctwalletURL="http://localhost:8089";
-	static String factomdURL="http://localhost:8088";
+	public static String fctwalletURL="http://localhost:8089";
+	public static String factomdURL="http://localhost:8088";
 	
 
 	

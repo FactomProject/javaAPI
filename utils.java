@@ -18,6 +18,7 @@ public class utils {
 			  HttpURLConnection connection = null;  
 			  try {
 			    //Create connection
+				
 			    URL url = new URL(targetURL);
 			    connection = (HttpURLConnection)url.openConnection();
 			    connection.setRequestMethod("POST");
