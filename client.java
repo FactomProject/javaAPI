@@ -1,5 +1,7 @@
 /**
- * 
+ * Copyright 2016 Factom Foundation
+ * Use of this source code is governed by the MIT
+ * license that can be found in the LICENSE file.
  */
 package Factom;
 
@@ -28,6 +30,7 @@ public class client {
 	 */
 	public static void main(String[] args) {
 		
+
 		readconfig();
 
 		String test=""; 
@@ -87,23 +90,26 @@ public class client {
 			}
 			else if (args[0].equals("balance")) {
 				try {
-					String bal="";
-					if (args[1].equals("fct")){
-						test=apiCalls.GetFactoidBalance(args[2]);					
-					} else if (args[1].equals("ec")) {
-						test=apiCalls.GetEntryCreditBalance(args[2]);							
+					if (!(args[2].matches("[a-zA-Z0-9-_]+"))) {
+						test="Invalid characters in " + args[2];
 					} else {
-						test=man(args[0]);					
+						String bal="";
+						if (args[1].equals("fct")){
+							test=apiCalls.GetFactoidBalance(args[2]);					
+						} else if (args[1].equals("ec")) {
+							test=apiCalls.GetEntryCreditBalance(args[2]);							
+						} else {
+							test=man(args[0]);					
+						}
+						
+						bal=getJsonResponseValue(test);  // all I care about is the number, not all json object
+						
+						if (args[1].equals("fct")){ //number is in factoshi
+						 test="Balance of " + args[2] + " = " + Float.parseFloat( bal) / 100000000.0;
+						} else {
+							 test="Balance of " + args[2] + " = " + bal;
+						}
 					}
-					
-					bal=getJsonResponseValue(test);  // all I care about is the number, not all json object
-					
-					if (args[1].equals("fct")){ //number is in factoshi
-					 test="Balance of " + args[2] + " = " + Float.parseFloat( bal) / 100000000.0;
-					} else {
-						 test="Balance of " + args[2] + " = " + bal;
-					}
-					
 
 				} catch (Exception e) {
 					test=man(args[0]);
@@ -120,7 +126,7 @@ public class client {
 			}
 			else if (args[0].equals("buyentrycredits")) {
 				try {
-					test=apiCalls.BuyEntryCreditsFullTransaction(args[1],args[2],Float.parseFloat(args[3]));
+					test=apiCalls.BuyEntryCreditsFullTransaction(args[1],args[2],Double.parseDouble(args[3]));
 					test=getJsonResponseValue(test);
 				} catch (Exception e) {
 					test=man(args[0]);
@@ -129,9 +135,12 @@ public class client {
 			}
 			else if (args[0].equals("deletetransaction")) {
 				try {
-					test=apiCalls.DeleteTransaction(args[1]);
-
-					test=getJsonResponseValue(test);
+					if (!(args[1].matches("[a-zA-Z0-9-_]+"))) {
+						test="Invalid characters in " + args[1];
+					} else {
+						test=apiCalls.DeleteTransaction(args[1]);
+						test=getJsonResponseValue(test);
+					}
 				} catch (Exception e) {
 					test=man(args[0]);
 				}				
@@ -249,7 +258,7 @@ public class client {
 			
 			else if (args[0].equals("list")) {
 				try {
-					test=apiCalls.GetProcessedTransactions(args[1],"");		
+					test=apiCalls.GetProcessedTransactions(args[1]);		
 					test=getJsonResponseValue(test);
 				} catch (Exception e){
 					man(args[0]);
@@ -391,7 +400,7 @@ public class client {
 				}
 			} else if (args[0].equals("sendfactoids")) {
 				try {
-					test=apiCalls.SendFactoidsFullTransaction(args[1],args[2],Float.parseFloat(args[3]));
+					test=apiCalls.SendFactoidsFullTransaction(args[1],args[2],Double.parseDouble(args[3]));
 					test=getJsonResponseValue(test);
 				} catch (Exception e){
 					man(args[0]);
