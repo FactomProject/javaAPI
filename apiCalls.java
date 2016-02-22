@@ -1090,6 +1090,84 @@ public class apiCalls {
 	}
 	
 	
+
+	/**ComposeChainCommit  - 
+	 *This is not base functionality.  It builds the first entry of a chain
+	* This does the transaction the hard way.  if your version of fctwallet has compose functionality, use that
+	* It does leave signing to the fctwallet
+	* 
+	* @param name paying ec address
+	* @param extids external ids as array of strings
+	* @param data - data to be to blockchain entry
+	* @return
+	* JSON document containing chainid.  Formatted for terminal<p>
+	* {"Response":"11914c19a28a98c57d12f3cce6c32b7944784f4b4781a706c24eb1dc284e2856","Success":true}
+	* or error message as Response
+	* <p>
+	* Example:<p>
+	* String [] extids={"123","456"}
+	* 
+	* responseText=ComposeChainCommit("EC2RYZzZxJvu2xT6JdKrVLjCMjXX5pmYyNMJG4tLoSyihvTemwyX",extids,"here is the body of your entry"); 
+	**/		
+	
+	public static String ComposeChainCommitLite(String name, String[] extids,String data) {
+		String resp="";		
+		Chain c=new Chain();	
+		Entry e=new  Entry();	
+		//e.setChainID(chainID);
+		e.setExtIDs(extids);
+		e.Content =data.getBytes();
+		byte[] postData=new byte[0];
+		// put external IDs in entry
+		byte[] weld;
+		byte[] double256Chain;
+		
+		//put content into entry		
+		c.setFirstEntry(e);
+		e.setEntryHash();
+		
+		
+		double256Chain=utils.sha256Bytes(utils.sha256Bytes(c.ChainID));
+		weld=utils.sha256Bytes(utils.sha256Bytes(utils.appendByteArrays(e.entryHash , c.ChainID)));
+
+		postData=utils.appendByteToArray(postData, (byte)0);						//version
+		postData=utils.appendByteArrays(postData,utils. MilliTime());		//millitime
+		postData=utils.appendByteArrays(postData,double256Chain );//chainid hash hash twice
+		postData=utils.appendByteArrays(postData, weld);	//commit weld
+		postData=utils.appendByteArrays(postData,e.entryHash );		//hash of first entry
+		postData=utils.appendByteToArray(postData, (byte)11);						//cost
+		
+		
+		//rI could use a json marshal here, but I want the message format to be obvious.
+		String jsonPost="{\"Message\":\"" + utils.bytesToHex(postData).toLowerCase() + "\"}";
+		
+		
+		resp=utils.executePost(fctwalletURL + "/v1/commit-chain/" + name,jsonPost);
+
+		if ( resp.equals("200")){
+			System.out.println("waiting 10 seconds before calling reveal.");
+			System.out.println("Milestone 2 will have receipts making this redundant.");
+			try{
+			Thread.sleep(10000);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+
+			resp=RevealChainOrEntry(e,"Chain");
+		} else {
+			
+		}
+		if (resp.equals("200")) {
+			return utils.bytesToHex(e.ChainID) ;
+		} else {	
+			return resp;		
+		}
+
+	}
+	
+	
+	
+	
 	/**ComposeEntryCommit  - 
 	 *This is not base functionality.  It adds an entry to a known chain
 	* This does the transaction the hard way.  if your version of fctwallet has compose functionality, use that

@@ -311,7 +311,7 @@ public class client {
 			else if (args[0].equals("newaddress") || args[0].equals("generateaddress")) {
 				try { // if the correct number of arguments are not sent, call man
 					if (!(args[2].matches("[a-zA-Z0-9-_]+"))) {
-						test="Invalid characters in " + args[2];
+						test="Invalid characters in \"" + args[2] + "\"";
 					} else {
 						if (args.length == 3) {
 						  if (args[1].toLowerCase().equals("fct")){
@@ -319,7 +319,24 @@ public class client {
 						  } else if (args[1].toLowerCase().equals("ec")){
 							  test=apiCalls.GenerateEntryCreditAddress(args[2]);
 						  }
-						} else if (args.length == 4) {
+				   
+						} else {
+							// not enough or too many command line arguments
+							man("newaddress");
+						}
+						test=getJsonResponseValue(test);
+					}
+					} catch (Exception e) {
+					  man("newaddress"); 	
+					}
+			}
+			else if (args[0].equals("importaddress") ) {
+				try { // if the correct number of arguments are not sent, call man
+					if (!(args[2].matches("[a-zA-Z0-9-_]+"))) {
+						test="Invalid characters in \"" + args[2] + "\"";
+					} else {
+
+						 if (args.length == 4) {
 							  if (args[1].toLowerCase().equals("fct")){
 								  test=apiCalls.GenerateAddressFromHumanReadablePrivateKey(args[2],args[3]);
 							  } else if (args[1].toLowerCase().equals("ec")){
@@ -330,10 +347,10 @@ public class client {
 							man("newaddress");
 						}
 						test=getJsonResponseValue(test);
-					}
-					} catch (Exception e) {
-					  man("newaddress"); 	
-					}
+						}
+				} catch (Exception e) {
+					 man("newaddress"); 	
+				}
 			}
 			else if (args[0].equals("newtransaction")) {
 				try {
@@ -498,6 +515,11 @@ System.out.println("                         Duplicate Name or Invalid Name Erro
 System.out.println("     ec name Es...       Import a secret EC key to the wallet");
 System.out.println("     fct name Fs...      Import a secret Factoid key to the wallet");
 System.out.println(" ");
+if (cmd.equals("ALL") || cmd.equals("importaddress") || cmd.equals("importaddress")) {
+System.out.println("  importaddress          imports private key into wallet as name supplied.");
+System.out.println("     ec name Es...       Import a secret EC key to the wallet");
+System.out.println("     fct name Fs...      Import a secret Factoid key to the wallet");
+System.out.println(" ");
 }
 if (cmd.equals("ALL") || cmd.equals("addinput")) {
 System.out.println("  addinput               Add an input to a transaction");			
@@ -619,7 +641,7 @@ System.out.println("                         the Protocal version, the version o
 		
 System.out.println(" ");
 }
-
+}
 
 return " "; // this is just managing the test println in main.
 }  //man
